@@ -1,0 +1,976 @@
+{% extends "base.html" %}
+{% block title %}Depression Assessment{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+    <div class="bg-white rounded-lg shadow-2xl p-4 sm:p-6">
+        <h1 class="text-2xl sm:text-3xl font-bold text-center mb-2 sm:mb-3 text-gray-800">
+            <i class="fas fa-brain text-purple-600 mr-2"></i><span class="hidden xs:inline">Depression </span>Risk Assessment
+        </h1>
+        <p class="text-center text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Complete all 31 questions for AI-powered analysis</p>
+
+        <form id="predictionForm" class="space-y-6" onsubmit="return handleFormSubmit(event);">
+            
+            <!-- Model Selection -->
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-5 border-2 border-purple-200">
+                <label class="block text-lg font-bold text-gray-800 mb-3">
+                    <i class="fas fa-robot mr-2 text-purple-600"></i>Select AI Model
+                </label>
+                <select name="model_type" id="model_type" 
+                        class="w-full px-4 py-3 border-2 border-purple-300 rounded-lg text-lg font-medium bg-white">
+                    <option value="">Loading available models...</option>
+                </select>
+                <p id="modelHint" class="text-xs text-gray-500 mt-2 italic">💡 Loading models...</p>
+                
+                <!-- Model Performance Comparison Button -->
+                <div class="mt-3 text-center">
+                    <button type="button" onclick="showModelComparison()" 
+                            class="text-sm text-purple-600 hover:text-purple-800 font-semibold underline">
+                        <i class="fas fa-chart-bar mr-1"></i>Compare Model Performance
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="bg-gray-200 rounded-full h-2">
+                <div id="progressBar" class="bg-purple-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+            </div>
+            <p class="text-center text-sm text-gray-600"><span id="progressText">0/31 completed</span></p>
+
+            <!-- Section 1: PHQ-9 -->
+            <div class="border-2 border-purple-200 rounded-lg p-5 bg-purple-50">
+                <h3 class="text-xl font-bold mb-2 text-purple-700">
+                    <i class="fas fa-clipboard-list mr-2"></i>Section 1: Psychological Symptoms (PHQ-9)
+                </h3>
+                <p class="text-sm text-gray-600 mb-4 italic">Over the last 2 weeks, how often:</p>
+                <div class="space-y-3">
+                    {% set phq9_questions = [
+                        "Little interest or pleasure in doing things?",
+                        "Feeling down, depressed, or hopeless?",
+                        "Trouble falling/staying asleep, or sleeping too much?",
+                        "Feeling tired or having little energy?",
+                        "Poor appetite or overeating?",
+                        "Feeling bad about yourself or that you are a failure?",
+                        "Trouble concentrating on things?",
+                        "Moving/speaking slowly or being fidgety/restless?",
+                        "Thoughts of being better off dead or hurting yourself?"
+                    ] %}
+                    {% for i in range(9) %}
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium text-gray-800 mb-2">{{ i + 1 }}. {{ phq9_questions[i] }}</label>
+                        <select name="feature_{{ i }}" class="question-input w-full px-3 py-2 border rounded-lg" required>
+                            <option value="">Select...</option>
+                            <option value="0">Not at all</option>
+                            <option value="1">Several days</option>
+                            <option value="2">More than half the days</option>
+                            <option value="3">Nearly every day</option>
+                        </select>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Section 2: Women-Specific -->
+            <div class="border-2 border-pink-200 rounded-lg p-5 bg-pink-50">
+                <h3 class="text-xl font-bold mb-2 text-pink-700">
+                    <i class="fas fa-female mr-2"></i>Section 2: Women-Specific Factors
+                </h3>
+                <p class="text-sm text-gray-600 mb-4 italic">Please rate the following:</p>
+                <div class="space-y-3">
+                    {% set women_questions = [
+                        "Hormonal changes affecting mood (menstrual, pregnancy, menopause)?",
+                        "Postpartum mood changes (if applicable)?",
+                        "Body image concerns or dissatisfaction?",
+                        "Relationship stress or domestic issues?",
+                        "Work-life balance difficulties?",
+                        "Caregiving burden (children, elderly parents)?"
+                    ] %}
+                    {% for i in range(6) %}
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium text-gray-800 mb-2">{{ i + 10 }}. {{ women_questions[i] }}</label>
+                        <select name="feature_{{ i + 9 }}" class="question-input w-full px-3 py-2 border rounded-lg" required>
+                            <option value="">Select...</option>
+                            <option value="0">No impact</option>
+                            <option value="1">Mild</option>
+                            <option value="2">Moderate</option>
+                            <option value="3">Severe</option>
+                        </select>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Section 3: Physiological -->
+            <div class="border-2 border-blue-200 rounded-lg p-5 bg-blue-50">
+                <h3 class="text-xl font-bold mb-2 text-blue-700">
+                    <i class="fas fa-heartbeat mr-2"></i>Section 3: Physiological Indicators
+                </h3>
+                <p class="text-sm text-gray-600 mb-4 italic">Please provide measurements:</p>
+                <div class="grid md:grid-cols-2 gap-3">
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">16. Resting heart rate (bpm)</label>
+                        <input type="number" name="feature_15" class="question-input w-full px-3 py-2 border rounded-lg" min="50" max="120" placeholder="60-100" required>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">17. Heart rate variability (ms)</label>
+                        <input type="number" name="feature_16" class="question-input w-full px-3 py-2 border rounded-lg" min="20" max="100" placeholder="20-100" required>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">18. Sleep duration (hours/night)</label>
+                        <input type="number" name="feature_17" class="question-input w-full px-3 py-2 border rounded-lg" min="3" max="12" step="0.5" placeholder="7-9" required>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">19. Sleep quality (0-10)</label>
+                        <input type="number" name="feature_18" class="question-input w-full px-3 py-2 border rounded-lg" min="0" max="10" placeholder="0-10" required>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">20. Physical activity (min/week)</label>
+                        <input type="number" name="feature_19" class="question-input w-full px-3 py-2 border rounded-lg" min="0" max="500" placeholder="150" required>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">21. Stress level (0-10)</label>
+                        <input type="number" name="feature_20" class="question-input w-full px-3 py-2 border rounded-lg" min="0" max="10" placeholder="0-10" required>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">22. BP Systolic (mmHg)</label>
+                        <input type="number" name="feature_21" class="question-input w-full px-3 py-2 border rounded-lg" min="90" max="180" placeholder="120" required>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">23. BP Diastolic (mmHg)</label>
+                        <input type="number" name="feature_22" class="question-input w-full px-3 py-2 border rounded-lg" min="60" max="120" placeholder="80" required>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">24. BMI (kg/m²)</label>
+                        <input type="number" name="feature_23" class="question-input w-full px-3 py-2 border rounded-lg" min="15" max="45" step="0.1" placeholder="18.5-24.9" required>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">25. Vitamin D level</label>
+                        <select name="feature_24" class="question-input w-full px-3 py-2 border rounded-lg" required>
+                            <option value="">Select...</option>
+                            <option value="0">Deficient</option>
+                            <option value="1">Insufficient</option>
+                            <option value="2">Sufficient</option>
+                            <option value="3">Optimal</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Social -->
+            <div class="border-2 border-green-200 rounded-lg p-5 bg-green-50">
+                <h3 class="text-xl font-bold mb-2 text-green-700">
+                    <i class="fas fa-users mr-2"></i>Section 4: Social & Environmental Factors
+                </h3>
+                <div class="space-y-3">
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">26. Social support (0=None, 3=Strong)</label>
+                        <select name="feature_25" class="question-input w-full px-3 py-2 border rounded-lg" required>
+                            <option value="">Select...</option>
+                            <option value="0">None</option>
+                            <option value="1">Limited</option>
+                            <option value="2">Moderate</option>
+                            <option value="3">Strong</option>
+                        </select>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">27. Financial stress level</label>
+                        <select name="feature_26" class="question-input w-full px-3 py-2 border rounded-lg" required>
+                            <option value="">Select...</option>
+                            <option value="0">None</option>
+                            <option value="1">Mild</option>
+                            <option value="2">Moderate</option>
+                            <option value="3">Severe</option>
+                        </select>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">28. Traumatic events (past year)</label>
+                        <select name="feature_27" class="question-input w-full px-3 py-2 border rounded-lg" required>
+                            <option value="">Select...</option>
+                            <option value="0">None</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three or more</option>
+                        </select>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">29. Substance use</label>
+                        <select name="feature_28" class="question-input w-full px-3 py-2 border rounded-lg" required>
+                            <option value="">Select...</option>
+                            <option value="0">None</option>
+                            <option value="1">Occasional</option>
+                            <option value="2">Regular</option>
+                            <option value="3">Excessive</option>
+                        </select>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">30. Chronic illness or pain</label>
+                        <select name="feature_29" class="question-input w-full px-3 py-2 border rounded-lg" required>
+                            <option value="">Select...</option>
+                            <option value="0">None</option>
+                            <option value="1">Mild</option>
+                            <option value="2">Moderate</option>
+                            <option value="3">Severe</option>
+                        </select>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        <label class="block text-sm font-medium mb-2">31. Family history of depression</label>
+                        <select name="feature_30" class="question-input w-full px-3 py-2 border rounded-lg" required>
+                            <option value="">Select...</option>
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="text-center pt-4">
+                <button type="submit" id="submitBtn"
+                        class="bg-purple-600 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-purple-700 transition transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-brain mr-2"></i>Analyze Depression Risk
+                </button>
+                <p id="submitHint" class="text-sm text-gray-500 mt-2 hidden">
+                    <i class="fas fa-info-circle mr-1"></i>Please answer all 31 questions to continue
+                </p>
+            </div>
+        </form>
+
+        <!-- Results Section -->
+        <div id="results" class="mt-8 hidden">
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border-2 border-purple-200">
+                <h3 class="text-2xl font-bold text-center mb-6">Prediction Results</h3>
+                
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white rounded-lg p-5 shadow text-center">
+                        <p class="text-gray-600 mb-2 text-sm">Model Used</p>
+                        <p id="modelUsed" class="text-xl font-bold text-purple-600"></p>
+                    </div>
+                    <div class="bg-white rounded-lg p-5 shadow text-center">
+                        <p class="text-gray-600 mb-2 text-sm">Prediction</p>
+                        <p id="predictionText" class="text-2xl font-bold"></p>
+                    </div>
+                    <div class="bg-white rounded-lg p-5 shadow text-center">
+                        <p class="text-gray-600 mb-2 text-sm">Risk Level</p>
+                        <p id="riskLevel" class="text-2xl font-bold"></p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg p-5 shadow">
+                    <h4 class="font-semibold mb-3 text-center">Probability Distribution</h4>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium">No Depression</span>
+                                <span id="noDepressionProb" class="text-sm font-medium"></span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div id="noDepressionBar" class="bg-green-500 h-4 rounded-full transition-all duration-500"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium">Depression</span>
+                                <span id="depressionProb" class="text-sm font-medium"></span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div id="depressionBar" class="bg-red-500 h-4 rounded-full transition-all duration-500"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p class="text-xs text-blue-800">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            <strong>Note:</strong> Probabilities are calibrated for medical safety. 
+                            AI models never show absolute 0% or 100% certainty, as no prediction is perfect.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- AI Insights Button (Only for Depression Cases) -->
+                <div id="aiInsightsButton" class="mt-6 hidden">
+                    <div class="bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg p-5 border-2 border-purple-300 text-center">
+                        <h4 class="font-bold text-lg mb-2 text-purple-900">
+                            <i class="fas fa-brain mr-2"></i>Need Help & Guidance?
+                        </h4>
+                        <p class="text-sm text-gray-700 mb-4">
+                            Get personalized AI-powered insights, wellness tips, and spiritual guidance to support your mental health journey.
+                        </p>
+                        <button onclick="loadAIInsights()" id="getInsightsBtn" 
+                                class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:from-purple-700 hover:to-blue-700 transition transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-sparkles mr-2"></i>Get AI-Powered Insights
+                        </button>
+                        <p class="text-xs text-gray-600 mt-2">
+                            <i class="fas fa-lock mr-1"></i>Personalized recommendations for your well-being
+                        </p>
+                    </div>
+                </div>
+
+                <!-- AI Insights Section -->
+                <div id="aiInsights" class="mt-6 hidden">
+                    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-5 border-2 border-blue-200">
+                        <h4 class="font-bold text-lg mb-3 text-blue-900">
+                            <i class="fas fa-sparkles mr-2"></i>AI-Powered Insights
+                        </h4>
+                        <div id="aiExplanation" class="text-gray-700 mb-4 leading-relaxed"></div>
+                        
+                        <div id="wellnessTips" class="mt-4">
+                            <h5 class="font-semibold text-gray-800 mb-2">
+                                <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>Holistic Wellness Tips
+                            </h5>
+                            <ul id="tipsList" class="list-none space-y-2 text-gray-700"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spiritual Guidance Section -->
+                <div id="spiritualGuidance" class="mt-6 hidden">
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-5 border-2 border-purple-200">
+                        <h4 class="font-bold text-lg mb-3 text-purple-900">
+                            <i class="fas fa-heart mr-2"></i>Spiritual Guidance & Inner Peace
+                        </h4>
+                        <div id="spiritualMessage" class="text-gray-700 leading-relaxed italic"></div>
+                    </div>
+                </div>
+
+                <!-- Positive Message for No Depression Cases -->
+                <div id="positiveMessage" class="mt-6 hidden">
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-5 border-2 border-green-300">
+                        <h4 class="font-bold text-lg mb-3 text-green-900">
+                            <i class="fas fa-smile-beam mr-2"></i>Great News!
+                        </h4>
+                        <div class="text-gray-700 leading-relaxed">
+                            <p class="mb-3">
+                                Your screening results show <strong>no significant depression indicators</strong>. This is wonderful! 
+                                You're managing well in key areas of mental health.
+                            </p>
+                            <p class="mb-3">
+                                <strong>Keep up the good work:</strong>
+                            </p>
+                            <ul class="list-disc list-inside space-y-2 mb-3">
+                                <li>Continue your healthy routines and self-care practices</li>
+                                <li>Maintain strong social connections with friends and family</li>
+                                <li>Stay physically active and get adequate sleep</li>
+                                <li>Practice mindfulness and gratitude regularly</li>
+                            </ul>
+                            <p class="text-sm text-green-800 bg-green-100 p-3 rounded">
+                                <i class="fas fa-heart mr-2"></i>
+                                Remember: Mental health is an ongoing journey. Continue monitoring your well-being and 
+                                don't hesitate to seek support if you notice any changes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                    <p class="text-sm text-yellow-800">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <strong>Medical Disclaimer:</strong> This AI assessment is a screening tool only and should not replace 
+                        professional medical diagnosis. Please consult a healthcare provider for proper evaluation and treatment.
+                    </p>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <button onclick="resetForm()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
+                        <i class="fas fa-redo mr-2"></i>New Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="hidden text-center mt-8">
+            <i class="fas fa-spinner fa-spin text-5xl text-purple-600"></i>
+            <p class="mt-4 text-gray-600 font-medium">Analyzing with AI model...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+console.log('✅ Script block loaded - v3.0');
+
+// GLOBAL FORM SUBMIT HANDLER - Called directly from form onsubmit
+function handleFormSubmit(event) {
+    console.log('🚀 FORM SUBMIT - handleFormSubmit called!');
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Call the async submit function
+    submitPrediction();
+    return false; // Prevent default form submission
+}
+
+// Markdown to HTML converter for AI insights
+function parseMarkdown(text) {
+    if (!text) return '';
+    
+    let html = text;
+    
+    // Headers (### Header, ## Header, # Header)
+    html = html.replace(/^### (.*$)/gim, '<h5 class="font-bold text-base mt-3 mb-2 text-gray-800">$1</h5>');
+    html = html.replace(/^## (.*$)/gim, '<h4 class="font-bold text-lg mt-4 mb-2 text-gray-900">$1</h4>');
+    html = html.replace(/^# (.*$)/gim, '<h3 class="font-bold text-xl mt-4 mb-3 text-gray-900">$1</h3>');
+    
+    // Bold text (**text** or __text__)
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>');
+    html = html.replace(/__(.*?)__/g, '<strong class="font-semibold text-gray-900">$1</strong>');
+    
+    // Italic text (*text* or _text_)
+    html = html.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+    html = html.replace(/_(.*?)_/g, '<em class="italic">$1</em>');
+    
+    // Bullet points (- item or * item)
+    html = html.replace(/^\s*[-*]\s+(.+)$/gim, '<li class="ml-4 mb-1">• $1</li>');
+    
+    // Numbered lists (1. item)
+    html = html.replace(/^\s*\d+\.\s+(.+)$/gim, '<li class="ml-4 mb-1 list-decimal">$1</li>');
+    
+    // Wrap consecutive list items in ul/ol
+    html = html.replace(/(<li class="ml-4 mb-1">.*?<\/li>\s*)+/gs, '<ul class="space-y-1 my-2">$&</ul>');
+    html = html.replace(/(<li class="ml-4 mb-1 list-decimal">.*?<\/li>\s*)+/gs, '<ol class="space-y-1 my-2 ml-4">$&</ol>');
+    
+    // Paragraphs (double line break)
+    const paragraphs = html.split(/\n\n+/);
+    html = paragraphs.map(p => {
+        p = p.trim();
+        if (p && !p.startsWith('<')) {
+            return `<p class="mb-3 leading-relaxed">${p}</p>`;
+        }
+        return p;
+    }).join('\n');
+    
+    // Single line breaks
+    html = html.replace(/\n/g, '<br>');
+    
+    // Blockquotes (> text)
+    html = html.replace(/^&gt;\s+(.+)$/gim, '<blockquote class="border-l-4 border-purple-300 pl-4 italic text-gray-600 my-2">$1</blockquote>');
+    
+    return html;
+}
+
+// Model metadata - will be populated from API
+let modelMetadata = {};
+
+// Load available models dynamically
+async function loadAvailableModels() {
+    console.log('🔍 Loading available models...');
+    
+    const modelSelect = document.getElementById('model_type');
+    const modelHint = document.getElementById('modelHint');
+    
+    if (!modelSelect) {
+        console.error('❌ model_type element not found!');
+        return;
+    }
+    
+    try {
+        console.log('📡 Fetching /api/available-models...');
+        const response = await fetch('/api/available-models');
+        console.log('📥 Response received:', response.status);
+        const data = await response.json();
+        console.log('📊 Data:', data);
+        
+        if (data.success && data.models && Object.keys(data.models).length > 0) {
+            // Store model metadata from API
+            modelMetadata = data.models;
+            
+            modelSelect.innerHTML = '';
+            
+            // Sort models by accuracy (highest first)
+            const sortedModels = Object.entries(data.models).sort((a, b) => b[1].accuracy - a[1].accuracy);
+            
+            sortedModels.forEach(([key, model]) => {
+                const option = document.createElement('option');
+                option.value = key;
+                
+                let badge = '';
+                if (model.accuracy >= 88) badge = ' 🏆';
+                else if (model.accuracy >= 85) badge = ' ⭐';
+                
+                option.textContent = `${model.icon} ${model.name} - ${model.accuracy}% Accuracy${badge}`;
+                modelSelect.appendChild(option);
+            });
+            
+            const modelCount = Object.keys(data.models).length;
+            const bestModel = sortedModels[0][1];
+            
+            if (modelCount === 4) {
+                modelHint.innerHTML = `💡 All 4 models available | <strong>🏆 ${bestModel.name}: ${bestModel.accuracy}% accuracy (Recommended)</strong>`;
+                modelHint.className = 'text-xs text-green-600 mt-2 italic font-medium';
+            } else if (modelCount === 1) {
+                modelHint.textContent = '⚠️ Only 1 model available. Run: python scripts/train_models.py to train all models.';
+                modelHint.className = 'text-xs text-orange-600 mt-2 italic font-medium';
+            } else {
+                modelHint.innerHTML = `💡 ${modelCount} models available | <strong>🏆 ${bestModel.name} recommended (${bestModel.accuracy}%)</strong>`;
+                modelHint.className = 'text-xs text-blue-600 mt-2 italic font-medium';
+            }
+        } else {
+            // No models available - show error message
+            modelSelect.innerHTML = '<option value="" disabled selected>⚠️ Models Not Trained Yet</option>';
+            
+            if (data.message) {
+                modelHint.innerHTML = `❌ <strong>Models not trained!</strong><br>
+                    <a href="/train-guide" class="text-blue-600 hover:underline font-bold">📖 Click here for training guide</a> or run: 
+                    <code class="bg-gray-800 text-white px-2 py-1 rounded">python scripts/train_models.py</code>`;
+            } else {
+                modelHint.innerHTML = '❌ No models available. <a href="/train-guide" class="text-blue-600 hover:underline font-bold">View training guide</a>';
+            }
+            modelHint.className = 'text-xs text-red-600 mt-2 font-medium';
+            
+            // Disable the form
+            document.getElementById('predictionForm').style.opacity = '0.6';
+            document.getElementById('predictionForm').style.pointerEvents = 'none';
+        }
+    } catch (error) {
+        console.error('❌ Error loading models:', error);
+        console.error('Error details:', error.message, error.stack);
+        
+        modelSelect.innerHTML = '<option value="" disabled selected>⚠️ Error Loading Models</option>';
+        if (modelHint) {
+            modelHint.innerHTML = '❌ <strong>Could not connect to server.</strong> Please check if the app is running.';
+            modelHint.className = 'text-xs text-red-600 mt-2 font-medium';
+        }
+    }
+}
+
+// Show model comparison modal
+function showModelComparison() {
+    if (!modelMetadata || Object.keys(modelMetadata).length === 0) {
+        alert('⚠️ Model data not loaded yet. Please wait...');
+        return;
+    }
+    
+    const modal = document.createElement('div');
+    modal.id = 'modelComparisonModal';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+    modal.onclick = function(e) {
+        if (e.target === modal) closeModelComparison();
+    };
+    
+    // Sort models by accuracy
+    const sortedModels = Object.entries(modelMetadata).sort((a, b) => b[1].accuracy - a[1].accuracy);
+    const bestModel = sortedModels[0][1];
+    const baselineModel = sortedModels[sortedModels.length - 1][1];
+    const improvement = ((bestModel.accuracy - baselineModel.accuracy) / baselineModel.accuracy * 100).toFixed(1);
+    
+    modal.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
+                <h3 class="text-2xl font-bold text-gray-800">
+                    <i class="fas fa-chart-bar text-purple-600 mr-2"></i>
+                    Model Performance Comparison
+                </h3>
+                <button onclick="closeModelComparison()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300">
+                        <thead class="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-bold">Model</th>
+                                <th class="px-4 py-3 text-center font-bold">Category</th>
+                                <th class="px-4 py-3 text-center font-bold">Accuracy</th>
+                                <th class="px-4 py-3 text-center font-bold">Precision</th>
+                                <th class="px-4 py-3 text-center font-bold">Recall</th>
+                                <th class="px-4 py-3 text-center font-bold">F1-Score</th>
+                                <th class="px-4 py-3 text-center font-bold">AUC-ROC</th>
+                                <th class="px-4 py-3 text-center font-bold">Specificity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sortedModels.map(([key, model], idx) => {
+                                const rowClass = idx === 0 ? 'bg-green-50 font-bold' : idx % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                                const badge = idx === 0 ? '<span class="ml-2 text-xl">🏆</span>' : '';
+                                return `
+                                    <tr class="${rowClass} hover:bg-purple-50 transition">
+                                        <td class="px-4 py-3 border-t">
+                                            <div class="flex items-center">
+                                                <span class="text-xl mr-2">${model.icon}</span>
+                                                <span class="font-semibold">${model.name}</span>
+                                                ${badge}
+                                            </div>
+                                            <div class="text-xs text-gray-600 mt-1">${model.description || ''}</div>
+                                        </td>
+                                        <td class="px-4 py-3 border-t text-center text-sm">${model.category}</td>
+                                        <td class="px-4 py-3 border-t text-center font-bold text-lg">${model.accuracy}%</td>
+                                        <td class="px-4 py-3 border-t text-center">${model.precision}%</td>
+                                        <td class="px-4 py-3 border-t text-center">${model.recall}%</td>
+                                        <td class="px-4 py-3 border-t text-center">${model.f1_score}%</td>
+                                        <td class="px-4 py-3 border-t text-center font-semibold">${model.auc_roc.toFixed(3)}</td>
+                                        <td class="px-4 py-3 border-t text-center">${model.specificity}%</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4">
+                    <h4 class="font-bold text-blue-900 mb-2">
+                        <i class="fas fa-info-circle mr-2"></i>Performance Insights
+                    </h4>
+                    <ul class="text-sm text-blue-800 space-y-1">
+                        <li>🏆 <strong>${bestModel.name}</strong> achieves the highest accuracy (${bestModel.accuracy}%) and AUC-ROC (${bestModel.auc_roc.toFixed(3)})</li>
+                        <li>📊 This represents a <strong>+${improvement}%</strong> improvement over the baseline ${baselineModel.name}</li>
+                        <li>🎯 AUC-ROC > 0.9 indicates <strong>excellent</strong> discrimination ability</li>
+                        <li>⚡ Multimodal approach combines questionnaire + physiological data for superior performance</li>
+                        <li>🔬 All metrics validated through rigorous cross-validation and testing</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-gray-600">
+                        <i class="fas fa-graduation-cap mr-1"></i>
+                        Data from PhD Research: Depression Detection Using Machine Learning
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function closeModelComparison() {
+    const modal = document.getElementById('modelComparisonModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Add immediate execution test
+console.log('✅ predict.html JavaScript loaded!');
+console.log('📍 Current URL:', window.location.href);
+
+// Progress tracking - Define globally
+let questionInputs, progressBar, progressText;
+const totalQuestions = 31;
+
+// Initialize progress tracking after DOM loads
+document.addEventListener('DOMContentLoaded', function() {
+    questionInputs = document.querySelectorAll('.question-input');
+    progressBar = document.getElementById('progressBar');
+    progressText = document.getElementById('progressText');
+    
+    // Add change listeners
+    questionInputs.forEach(input => {
+        input.addEventListener('change', updateProgress);
+    });
+});
+
+function updateProgress() {
+    let completed = 0;
+    questionInputs.forEach(input => {
+        if (input.value !== '') completed++;
+    });
+    const percentage = (completed / totalQuestions) * 100;
+    progressBar.style.width = percentage + '%';
+    progressText.textContent = `${completed}/${totalQuestions} completed`;
+    
+    // Update submit button state
+    const submitBtn = document.getElementById('submitBtn');
+    const submitHint = document.getElementById('submitHint');
+    
+    if (completed === totalQuestions) {
+        submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+        submitBtn.classList.add('animate-pulse');
+        submitHint.classList.add('hidden');
+        progressText.classList.add('text-green-600', 'font-bold');
+        progressText.innerHTML = `<i class="fas fa-check-circle mr-1"></i>${completed}/${totalQuestions} completed - Ready!`;
+    } else {
+        submitBtn.classList.remove('animate-pulse');
+        submitHint.classList.remove('hidden');
+        progressText.classList.remove('text-green-600', 'font-bold');
+    }
+}
+
+// GLOBAL ASYNC SUBMIT FUNCTION
+async function submitPrediction() {
+    console.log('📤 submitPrediction called!');
+    
+    const form = document.getElementById('predictionForm');
+    if (!form) {
+        console.error('❌ Form not found!');
+        return;
+    }
+    
+    // Validate all questions are answered
+    let unanswered = [];
+    questionInputs.forEach((input, index) => {
+        if (!input.value || input.value === '') {
+            unanswered.push(index + 1);
+            input.classList.add('border-red-500', 'border-2');
+        } else {
+            input.classList.remove('border-red-500', 'border-2');
+        }
+    });
+    
+    if (unanswered.length > 0) {
+        alert(`⚠️ Please answer all questions!\n\nMissing answers for question(s): ${unanswered.join(', ')}\n\nTotal: ${unanswered.length} unanswered`);
+        // Scroll to first unanswered question
+        questionInputs[unanswered[0] - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        questionInputs[unanswered[0] - 1].focus();
+        return;
+    }
+    
+    document.getElementById('loading').classList.remove('hidden');
+    document.getElementById('results').classList.add('hidden');
+    
+    // Get form data
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
+    
+    // Store form data globally for AI insights
+    window.currentFormData = data;
+    
+    try {
+        console.log('Submitting prediction with data:', data);
+        
+        const response = await fetch('/predict', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        console.log('Response status:', response.status);
+        const result = await response.json();
+        console.log('Result:', result);
+        
+        if (result.success) {
+            console.log('Displaying results...');
+            displayResults(result.result, data.model_type, data);
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            console.error('Prediction error:', result.error);
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+        alert('Error: ' + error.message);
+    } finally {
+        document.getElementById('loading').classList.add('hidden');
+    }
+}
+
+// CONSOLIDATED DOMContentLoaded - Load models on page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎯 DOM LOADED - Initializing...');
+    console.log('📊 Loading models...');
+    loadAvailableModels();
+});
+
+function displayResults(result, modelType, formData) {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.classList.remove('hidden');
+    
+    // Model name
+    const modelNames = {
+        'random_forest': 'Random Forest',
+        'gradient_boosting': 'Gradient Boosting',
+        'deep_learning': 'Deep Learning',
+        'logistic_regression': 'Logistic Regression'
+    };
+    document.getElementById('modelUsed').textContent = modelNames[modelType];
+    
+    // Prediction
+    const predictionText = result.prediction === 1 ? 'Depression Detected' : 'No Depression';
+    const predictionColor = result.prediction === 1 ? 'text-red-600' : 'text-green-600';
+    document.getElementById('predictionText').textContent = predictionText;
+    document.getElementById('predictionText').className = `text-2xl font-bold ${predictionColor}`;
+    
+    // Risk level
+    const riskColors = {
+        'Low': 'text-green-600',
+        'Moderate': 'text-yellow-600',
+        'High': 'text-orange-600',
+        'Very High': 'text-red-600'
+    };
+    document.getElementById('riskLevel').textContent = result.risk_level;
+    document.getElementById('riskLevel').className = `text-2xl font-bold ${riskColors[result.risk_level]}`;
+    
+    // Probabilities
+    const noDepProb = (result.probability.no_depression * 100).toFixed(1);
+    const depProb = (result.probability.depression * 100).toFixed(1);
+    
+    document.getElementById('noDepressionProb').textContent = noDepProb + '%';
+    document.getElementById('depressionProb').textContent = depProb + '%';
+    document.getElementById('noDepressionBar').style.width = noDepProb + '%';
+    document.getElementById('depressionBar').style.width = depProb + '%';
+    
+    // Show AI Insights button for depression cases, positive message for no depression
+    if (result.prediction === 1) {
+        // Depression detected - show AI insights button
+        document.getElementById('aiInsightsButton').classList.remove('hidden');
+        document.getElementById('positiveMessage').classList.add('hidden');
+        
+        // Store result data globally for AI insights request
+        window.currentPredictionResult = result;
+        window.currentPredictionData = formData;
+    } else {
+        // No depression - show positive message
+        document.getElementById('positiveMessage').classList.remove('hidden');
+        document.getElementById('aiInsightsButton').classList.add('hidden');
+    }
+    
+    // Hide AI insights sections initially
+    document.getElementById('aiInsights').classList.add('hidden');
+    document.getElementById('spiritualGuidance').classList.add('hidden');
+    
+    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Load AI Insights on demand (when user clicks button)
+async function loadAIInsights() {
+    console.log('🧠 Loading AI insights...');
+    
+    const button = document.getElementById('getInsightsBtn');
+    const aiInsightsDiv = document.getElementById('aiInsights');
+    const spiritualDiv = document.getElementById('spiritualGuidance');
+    
+    // Show loading state
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generating Insights...';
+    
+    try {
+        // Get stored prediction data
+        const result = window.currentPredictionResult;
+        const formData = window.currentPredictionData;
+        
+        if (!result || !formData) {
+            throw new Error('Prediction data not found');
+        }
+        
+        // Make API request for AI insights
+        const response = await fetch('/api/get-ai-insights', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                prediction: result.prediction,
+                probability: result.probability,
+                risk_level: result.risk_level,
+                questionnaire_data: formData
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Display AI explanation with markdown formatting
+            if (data.ai_explanation) {
+                const explanationHtml = parseMarkdown(data.ai_explanation);
+                document.getElementById('aiExplanation').innerHTML = explanationHtml;
+                aiInsightsDiv.classList.remove('hidden');
+            }
+            
+            // Display wellness tips with proper formatting
+            if (data.wellness_tips && data.wellness_tips.length > 0) {
+                const tipsList = document.getElementById('tipsList');
+                tipsList.innerHTML = '';
+                data.wellness_tips.forEach((tip, index) => {
+                    const li = document.createElement('li');
+                    const tipHtml = parseMarkdown(tip);
+                    li.innerHTML = `<div class="flex items-start mb-3">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">${index + 1}</span>
+                        <div class="flex-1 text-sm">${tipHtml}</div>
+                    </div>`;
+                    li.className = 'border-b border-gray-100 last:border-0 pb-2 last:pb-0';
+                    tipsList.appendChild(li);
+                });
+            }
+            
+            // Display spiritual guidance with markdown formatting
+            if (data.spiritual_guidance) {
+                const spiritualHtml = parseMarkdown(data.spiritual_guidance);
+                document.getElementById('spiritualMessage').innerHTML = spiritualHtml;
+                spiritualDiv.classList.remove('hidden');
+            }
+            
+            // Hide button after successful load
+            document.getElementById('aiInsightsButton').classList.add('hidden');
+            
+            // Scroll to insights
+            aiInsightsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+        } else {
+            // Show fallback message
+            document.getElementById('aiExplanation').innerHTML = `
+                <p class="text-gray-700 mb-3">
+                    <strong>AI insights are temporarily unavailable.</strong> Here are some general recommendations:
+                </p>
+                <p class="text-gray-700 mb-3">
+                    Based on your screening results, we recommend consulting with a mental health professional 
+                    for a comprehensive evaluation and personalized treatment plan.
+                </p>
+                <p class="text-gray-700">
+                    In the meantime, focus on self-care activities like regular sleep, exercise, and maintaining 
+                    social connections with supportive friends and family.
+                </p>
+            `;
+            aiInsightsDiv.classList.remove('hidden');
+            
+            // Show default tips
+            const tipsList = document.getElementById('tipsList');
+            tipsList.innerHTML = '';
+            const defaultTips = [
+                "🙏 Practice daily meditation or prayer for 10-15 minutes to connect with your inner peace",
+                "💪 Maintain a consistent sleep schedule (7-9 hours) and engage in gentle physical activity",
+                "📝 Journal your thoughts and practice gratitude - write 3 things you're grateful for each day",
+                "🤝 Stay connected with supportive friends, family, or spiritual community",
+                "🧘 Try yoga, deep breathing, or mindfulness practices to harmonize mind, body, and spirit",
+                "💖 Practice self-compassion and self-love - treat yourself with kindness"
+            ];
+            
+            defaultTips.forEach((tip, index) => {
+                const li = document.createElement('li');
+                const tipHtml = parseMarkdown(tip);
+                li.innerHTML = `<div class="flex items-start mb-3">
+                    <span class="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold mr-3 mt-0.5">${index + 1}</span>
+                    <div class="flex-1 text-sm">${tipHtml}</div>
+                </div>`;
+                li.className = 'border-b border-gray-100 last:border-0 pb-2 last:pb-0';
+                tipsList.appendChild(li);
+            });
+            
+            // Hide button
+            document.getElementById('aiInsightsButton').classList.add('hidden');
+        }
+        
+    } catch (error) {
+        console.error('Error loading AI insights:', error);
+        
+        // Show error message with fallback content
+        document.getElementById('aiExplanation').innerHTML = `
+            <p class="text-gray-700 mb-3">
+                <strong>Unable to load AI insights at this time.</strong> Here are some general recommendations:
+            </p>
+            <p class="text-gray-700 mb-3">
+                Based on your screening results, we recommend consulting with a mental health professional 
+                for a comprehensive evaluation and personalized treatment plan.
+            </p>
+            <p class="text-gray-700">
+                Remember: This screening is a tool to identify potential concerns, not a clinical diagnosis. 
+                Professional support can provide you with the guidance and care you need.
+            </p>
+        `;
+        aiInsightsDiv.classList.remove('hidden');
+        
+        // Reset button
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-sparkles mr-2"></i>Try Again';
+    }
+}
+
+function resetForm() {
+    document.getElementById('predictionForm').reset();
+    document.getElementById('results').classList.add('hidden');
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+{% endblock %}

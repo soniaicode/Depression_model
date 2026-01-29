@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Train Models - Setup Guide{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-2xl p-8">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">
+            <i class="fas fa-cogs text-purple-600 mr-2"></i>Model Training Guide
+        </h1>
+        
+        <!-- Status Check -->
+        <div id="statusCheck" class="mb-8 p-6 bg-blue-50 border-2 border-blue-200 rounded-lg">
+            <h2 class="text-xl font-bold mb-4 text-blue-800">
+                <i class="fas fa-info-circle mr-2"></i>Current Status
+            </h2>
+            <div id="statusContent" class="space-y-2">
+                <p class="text-gray-600">Checking model status...</p>
+            </div>
+        </div>
+
+        <!-- Training Steps -->
+        <div class="space-y-6">
+            <div class="p-6 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-purple-800">
+                    <i class="fas fa-rocket mr-2"></i>Quick Start - Train Models
+                </h2>
+                
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="font-bold text-lg mb-2 text-gray-800">
+                            <span class="bg-purple-600 text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-2">1</span>
+                            Open Terminal/Command Prompt
+                        </h3>
+                        <p class="text-gray-600 ml-10">Navigate to your project directory</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="font-bold text-lg mb-2 text-gray-800">
+                            <span class="bg-purple-600 text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-2">2</span>
+                            Run Training Script
+                        </h3>
+                        <div class="ml-10">
+                            <p class="text-gray-600 mb-2">Copy and run this command:</p>
+                            <div class="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm">
+                                python scripts/train_models_simple.py
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 italic">⏱️ This will take 5-10 minutes</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="font-bold text-lg mb-2 text-gray-800">
+                            <span class="bg-purple-600 text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-2">3</span>
+                            Restart Application
+                        </h3>
+                        <div class="ml-10">
+                            <p class="text-gray-600 mb-2">After training completes, restart the app:</p>
+                            <div class="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm">
+                                python app.py
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="font-bold text-lg mb-2 text-gray-800">
+                            <span class="bg-green-600 text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-2">✓</span>
+                            Start Predicting!
+                        </h3>
+                        <p class="text-gray-600 ml-10">Models will be available in the Assessment page</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What Gets Trained -->
+            <div class="p-6 bg-gray-50 border-2 border-gray-200 rounded-lg">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">
+                    <i class="fas fa-brain mr-2"></i>Models That Will Be Trained
+                </h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-purple-600">📊 Logistic Regression</h3>
+                        <p class="text-sm text-gray-600">Fast, interpretable statistical model</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-green-600">🌲 Random Forest</h3>
+                        <p class="text-sm text-gray-600">Ensemble learning with decision trees</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-yellow-600">⚡ Gradient Boosting</h3>
+                        <p class="text-sm text-gray-600">Advanced boosting algorithm</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-blue-600">🧠 Enhanced Multimodal
+</h3>
+                        <p class="text-sm text-gray-600">Neural network with multiple layers</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div class="p-6 bg-yellow-50 border-2 border-yellow-200 rounded-lg">
+                <h2 class="text-xl font-bold mb-4 text-yellow-800">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Troubleshooting
+                </h2>
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <strong class="text-gray-800">Error: "No module named 'tensorflow'"</strong>
+                        <p class="text-gray-600 ml-4">Run: <code class="bg-gray-800 text-white px-2 py-1 rounded">pip install tensorflow</code></p>
+                    </div>
+                    <div>
+                        <strong class="text-gray-800">Error: "No such file or directory"</strong>
+                        <p class="text-gray-600 ml-4">Make sure you're in the project root directory (D:\dp-main)</p>
+                    </div>
+                    <div>
+                        <strong class="text-gray-800">Training takes too long</strong>
+                        <p class="text-gray-600 ml-4">This is normal. Enhanced Multimodal
+ models can take 5-10 minutes to train.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="/predict" class="inline-block bg-purple-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-purple-700 transition">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Assessment
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Check model status
+async function checkModelStatus() {
+    try {
+        const response = await fetch('/api/available-models');
+        const data = await response.json();
+        
+        const statusContent = document.getElementById('statusContent');
+        
+        if (data.success && data.total > 0) {
+            statusContent.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                    <div>
+                        <p class="font-bold text-green-800">✅ Models are trained and ready!</p>
+                        <p class="text-sm text-gray-600">${data.total} model(s) available: ${data.loaded_models.join(', ')}</p>
+                        <a href="/predict" class="text-purple-600 hover:underline font-medium">Go to Assessment →</a>
+                    </div>
+                </div>
+            `;
+        } else {
+            statusContent.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-times-circle text-red-600 text-2xl"></i>
+                    <div>
+                        <p class="font-bold text-red-800">❌ No models found</p>
+                        <p class="text-sm text-gray-600">Please follow the steps below to train models</p>
+                    </div>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error checking status:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', checkModelStatus);
+</script>
+{% endblock %}

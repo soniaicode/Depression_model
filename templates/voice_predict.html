@@ -1,0 +1,523 @@
+{% extends "base.html" %}
+
+{% block title %}Voice-Based Depression Detection{% endblock %}
+
+{% block content %}
+<style>
+    .voice-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .voice-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .recording-section {
+        text-align: center;
+    }
+
+    .record-button {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 1.2em;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        margin: 20px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .record-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+
+    .record-button.recording {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .record-icon {
+        font-size: 3em;
+        margin-bottom: 10px;
+    }
+
+    .status-text {
+        margin-top: 20px;
+        font-size: 1.1em;
+        color: #666;
+    }
+
+    .status-text.recording {
+        color: #f5576c;
+        font-weight: bold;
+    }
+
+    .upload-section {
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 2px dashed #ddd;
+    }
+
+    .upload-label {
+        display: block;
+        padding: 20px;
+        background: #f8f9fa;
+        border: 2px dashed #667eea;
+        border-radius: 10px;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.3s;
+    }
+
+    .upload-label:hover {
+        background: #e9ecef;
+        border-color: #764ba2;
+    }
+
+    .upload-input {
+        display: none;
+    }
+
+    .analyze-button {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1em;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: all 0.3s;
+    }
+
+    .analyze-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .analyze-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    .result-card {
+        margin-top: 30px;
+        padding: 30px;
+        border-radius: 15px;
+        display: none;
+    }
+
+    .result-card.show {
+        display: block;
+        animation: slideIn 0.5s;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .result-card.low-risk {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    }
+
+    .result-card.high-risk {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    }
+
+    .result-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .result-icon {
+        font-size: 4em;
+        margin-bottom: 10px;
+    }
+
+    .result-title {
+        font-size: 2em;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .result-confidence {
+        font-size: 1.3em;
+        opacity: 0.8;
+    }
+
+    .result-details {
+        margin-top: 20px;
+    }
+
+    .detail-item {
+        background: rgba(255,255,255,0.5);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    .detail-label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .detail-value {
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 40px;
+        display: none;
+    }
+
+    .loading.show {
+        display: block;
+    }
+
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .audio-player {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .instructions {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .instructions h3 {
+        color: #856404;
+        margin-bottom: 10px;
+    }
+
+    .instructions ul {
+        margin-left: 20px;
+        color: #856404;
+    }
+
+    .instructions li {
+        margin-bottom: 5px;
+    }
+</style>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Page Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-3">
+            <i class="fas fa-microphone text-purple-600 mr-3"></i>Voice-Based Depression Detection
+        </h1>
+        <p class="text-lg text-gray-600">Record your voice or upload audio for instant AI-powered analysis</p>
+    </div>
+
+    <div class="voice-container">
+        <div class="voice-card">
+            <div class="instructions">
+                <h3>📝 Instructions:</h3>
+                <ul>
+                    <li>Speak naturally for 30-60 seconds</li>
+                    <li>Talk about how you're feeling or any topic</li>
+                    <li>Use a quiet environment for best results</li>
+                    <li>Hindi, English, or mixed language - all work!</li>
+                </ul>
+            </div>
+
+            <div class="recording-section">
+                <button class="record-button" id="recordButton" onclick="toggleRecording()">
+                    <div class="record-icon">🎙️</div>
+                    <div>Start Recording</div>
+                </button>
+                <div class="status-text" id="statusText">Click to start recording</div>
+                
+                <audio id="audioPlayer" class="audio-player" controls style="display:none;"></audio>
+            </div>
+
+            <div class="upload-section">
+                <h3 style="text-align:center; margin-bottom:15px;">Or Upload Audio File</h3>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <label for="audioFile" class="upload-label">
+                        📁 Click to select audio file (WAV, MP3, M4A)
+                        <div style="font-size:0.9em; color:#666; margin-top:10px;">
+                            Selected: <span id="fileName">No file chosen</span>
+                        </div>
+                    </label>
+                    <input type="file" id="audioFile" name="audio" accept="audio/*" class="upload-input" onchange="updateFileName()">
+                    
+                    <button type="submit" class="analyze-button" id="analyzeButton" disabled>
+                        🔍 Analyze Voice
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing your voice...</p>
+        </div>
+
+        <div class="result-card" id="resultCard">
+            <div class="result-header">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-title" id="resultTitle"></div>
+                <div class="result-confidence" id="resultConfidence"></div>
+            </div>
+            
+            <div class="result-details" id="resultDetails"></div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordedBlob = null;
+
+        async function toggleRecording() {
+            if (!isRecording) {
+                await startRecording();
+            } else {
+                stopRecording();
+            }
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        channelCount: 1,
+                        sampleRate: 22050,
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    }
+                });
+                
+                // Use audio/webm for better compatibility
+                const options = { mimeType: 'audio/webm' };
+                mediaRecorder = new MediaRecorder(stream, options);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(recordedBlob);
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.style.display = 'block';
+                    document.getElementById('analyzeButton').disabled = false;
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+
+                const button = document.getElementById('recordButton');
+                button.classList.add('recording');
+                button.innerHTML = '<div class="record-icon">⏹️</div><div>Stop Recording</div>';
+                
+                const statusText = document.getElementById('statusText');
+                statusText.textContent = 'Recording... Speak naturally';
+                statusText.classList.add('recording');
+
+            } catch (error) {
+                alert('Error accessing microphone: ' + error.message);
+            }
+        }
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            isRecording = false;
+
+            const button = document.getElementById('recordButton');
+            button.classList.remove('recording');
+            button.innerHTML = '<div class="record-icon">🎙️</div><div>Record Again</div>';
+            
+            const statusText = document.getElementById('statusText');
+            statusText.textContent = 'Recording complete! Click Analyze to get results';
+            statusText.classList.remove('recording');
+        }
+
+        function updateFileName() {
+            const input = document.getElementById('audioFile');
+            const fileName = document.getElementById('fileName');
+            if (input.files.length > 0) {
+                fileName.textContent = input.files[0].name;
+                document.getElementById('analyzeButton').disabled = false;
+                recordedBlob = null; // Clear recorded audio if file is uploaded
+            }
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            
+            // Use recorded audio or uploaded file
+            if (recordedBlob) {
+                formData.append('audio', recordedBlob, 'recording.wav');
+            } else {
+                const fileInput = document.getElementById('audioFile');
+                if (fileInput.files.length === 0) {
+                    alert('Please record or upload an audio file');
+                    return;
+                }
+                formData.append('audio', fileInput.files[0]);
+            }
+
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('resultCard').classList.remove('show');
+
+            try {
+                const response = await fetch('/api/predict-voice', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                // Hide loading
+                document.getElementById('loading').classList.remove('show');
+                
+                // Show results
+                displayResults(result);
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('show');
+                alert('Error analyzing audio: ' + error.message);
+            }
+        });
+
+        function displayResults(result) {
+            if (!result.success) {
+                alert('Error: ' + result.error);
+                return;
+            }
+
+            const resultCard = document.getElementById('resultCard');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultConfidence = document.getElementById('resultConfidence');
+            const resultDetails = document.getElementById('resultDetails');
+
+            // Set icon and title
+            if (result.prediction === 1) {
+                resultCard.className = 'result-card high-risk show';
+                resultIcon.textContent = '🔴';
+                resultTitle.textContent = 'Depression Detected';
+            } else {
+                resultCard.className = 'result-card low-risk show';
+                resultIcon.textContent = '🟢';
+                resultTitle.textContent = 'No Depression Detected';
+            }
+
+            resultConfidence.textContent = `Confidence: ${result.confidence.toFixed(1)}%`;
+
+            // Build details
+            let detailsHTML = `
+                <div class="detail-item">
+                    <div class="detail-label">📊 Risk Assessment</div>
+                    <div class="detail-value">${result.risk_level}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">📈 Probabilities</div>
+                    <div class="detail-value">
+                        No Depression: ${result.probability_no_depression.toFixed(1)}%<br>
+                        Depression: ${result.probability_depression.toFixed(1)}%
+                    </div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">🎤 Voice Characteristics</div>
+                    <div class="detail-value">
+                        Pitch: ${result.voice_features.pitch.toFixed(1)} Hz<br>
+                        Energy: ${result.voice_features.energy.toFixed(3)}<br>
+                        Pause Ratio: ${(result.voice_features.pause_ratio * 100).toFixed(1)}%<br>
+                        Duration: ${result.voice_features.duration.toFixed(1)} seconds
+                    </div>
+                </div>
+            `;
+
+            // Add indicators if any
+            const indicators = result.indicators;
+            const indicatorList = [];
+            if (indicators.low_pitch) indicatorList.push('Low Pitch (Monotone)');
+            if (indicators.monotone_speech) indicatorList.push('Reduced Pitch Variation');
+            if (indicators.low_energy) indicatorList.push('Low Energy/Volume');
+            if (indicators.slow_speech) indicatorList.push('Slow Speech Rate');
+            if (indicators.frequent_pauses) indicatorList.push('Frequent Pauses');
+            if (indicators.reduced_spectral_energy) indicatorList.push('Reduced Spectral Energy');
+
+            if (indicatorList.length > 0) {
+                detailsHTML += `
+                    <div class="detail-item">
+                        <div class="detail-label">⚠️ Depression Indicators</div>
+                        <div class="detail-value">
+                            ${indicatorList.map(ind => `• ${ind}`).join('<br>')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Add note if present
+            if (result.note) {
+                detailsHTML += `
+                    <div class="detail-item">
+                        <div class="detail-label">💡 Note</div>
+                        <div class="detail-value">${result.note}</div>
+                    </div>
+                `;
+            }
+
+            resultDetails.innerHTML = detailsHTML;
+        }
+    </script>
+{% endblock %}

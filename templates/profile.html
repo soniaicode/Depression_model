@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Profile - {{ user.full_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+        <i class="fas fa-user-circle text-purple-600 mr-2"></i>My Profile
+    </h1>
+
+    <div class="grid md:grid-cols-3 gap-6">
+        <!-- Profile Card -->
+        <div class="md:col-span-1">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="text-center mb-6">
+                    <div class="inline-block p-6 bg-purple-100 rounded-full mb-4">
+                        <i class="fas fa-user text-purple-600 text-5xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">{{ user.full_name }}</h2>
+                    <p class="text-gray-600">{{ user.email }}</p>
+                </div>
+
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Age:</span>
+                        <span class="font-semibold">{{ user.age }} years</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Gender:</span>
+                        <span class="font-semibold">{{ user.gender|capitalize }}</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Member Since:</span>
+                        <span class="font-semibold">{{ user.created_at.strftime('%b %Y') }}</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Total Assessments:</span>
+                        <span class="font-semibold text-purple-600">{{ user.total_assessments }}</span>
+                    </div>
+                </div>
+
+                <div class="mt-6 space-y-3">
+                    <a href="/edit-profile" class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                        <i class="fas fa-edit mr-2"></i>Edit Profile
+                    </a>
+                    <a href="/predict" class="block w-full bg-purple-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                        <i class="fas fa-plus mr-2"></i>New Assessment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details & History -->
+        <div class="md:col-span-2 space-y-6">
+            <!-- Demographic Information -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">
+                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>Demographic Information
+                </h3>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-gray-600 mb-1">Education Level</p>
+                        <p class="font-semibold">{{ user.education_years }} years</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 mb-1">Income Level</p>
+                        <p class="font-semibold">
+                            {% if user.income_level == 0 %}< $10,000
+                            {% elif user.income_level == 1 %}$10,000 - $30,000
+                            {% elif user.income_level == 2 %}$30,000 - $50,000
+                            {% else %}> $50,000{% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 mb-1">Marital Status</p>
+                        <p class="font-semibold">
+                            {% if user.marital_status == 0 %}Single
+                            {% elif user.marital_status == 1 %}Married
+                            {% elif user.marital_status == 2 %}Divorced
+                            {% else %}Widowed{% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 mb-1">Employment</p>
+                        <p class="font-semibold">{{ 'Employed' if user.employment_status == 1 else 'Unemployed' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 mb-1">Residence</p>
+                        <p class="font-semibold">{{ 'Urban' if user.residence_type == 1 else 'Rural' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 mb-1">Family History</p>
+                        <p class="font-semibold">{{ 'Yes' if user.family_history_depression == 1 else 'No' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Assessments -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">
+                    <i class="fas fa-history text-green-600 mr-2"></i>Recent Assessments
+                </h3>
+                
+                {% if predictions %}
+                <div class="space-y-3">
+                    {% for pred in predictions[:5] %}
+                    <div class="border rounded-lg p-4 hover:bg-gray-50 transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-semibold text-gray-800">
+                                    {{ pred.timestamp.strftime('%B %d, %Y at %I:%M %p') }}
+                                </p>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    Model: {{ pred.result.model_used|replace('_', ' ')|title }}
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                {% if pred.result.prediction == 1 %}
+                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
+                                    Depression
+                                </span>
+                                {% else %}
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+                                    No Depression
+                                </span>
+                                {% endif %}
+                                <p class="text-sm text-gray-600 mt-1">
+                                    Risk: {{ pred.result.risk_level }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if user.total_assessments > 5 %}
+                <div class="mt-4 text-center">
+                    <a href="/history" class="text-purple-600 hover:underline font-semibold">
+                        View All Assessments →
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-inbox text-4xl mb-3"></i>
+                    <p>No assessments yet</p>
+                    <a href="/predict" class="text-purple-600 hover:underline font-semibold mt-2 inline-block">
+                        Take your first assessment
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

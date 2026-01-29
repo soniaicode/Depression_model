@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile - Mental Health Platform{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-8 px-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">
+                        <i class="fas fa-edit text-purple-600 mr-2"></i>Edit Profile
+                    </h1>
+                    <p class="text-gray-600 mt-1">Update your personal information</p>
+                </div>
+                <a href="/profile" class="text-purple-600 hover:text-purple-700 font-medium">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Profile
+                </a>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% for message in get_flashed_messages() %}
+            <div class="mb-6 p-4 rounded-lg bg-blue-100 text-blue-700">
+                <i class="fas fa-info-circle mr-2"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <!-- Edit Form -->
+        <form method="POST" action="/edit-profile" class="bg-white rounded-lg shadow-lg p-6 space-y-6">
+            
+            <!-- Basic Information -->
+            <div class="border-2 border-purple-200 rounded-lg p-6 bg-purple-50">
+                <h3 class="text-xl font-bold mb-4 text-purple-700">
+                    <i class="fas fa-user mr-2"></i>Basic Information
+                </h3>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Full Name *
+                        </label>
+                        <input type="text" name="full_name" required
+                               value="{{ user.full_name }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                               placeholder="Enter your full name">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Email (Cannot be changed)
+                        </label>
+                        <input type="email" 
+                               value="{{ user.email }}"
+                               disabled
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+                               placeholder="your.email@example.com">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Age *
+                        </label>
+                        <input type="number" name="age" required min="18" max="100"
+                               value="{{ user.age }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                               placeholder="Enter your age">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Gender *
+                        </label>
+                        <select name="gender" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+                            <option value="Prefer not to say" {% if user.gender == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+                        </select>
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Phone Number (Optional)
+                        </label>
+                        <input type="tel" name="phone"
+                               value="{{ user.phone }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                               placeholder="+1 (555) 123-4567">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demographic Information -->
+            <div class="border-2 border-blue-200 rounded-lg p-6 bg-blue-50">
+                <h3 class="text-xl font-bold mb-4 text-blue-700">
+                    <i class="fas fa-chart-bar mr-2"></i>Demographic Information
+                </h3>
+                <p class="text-sm text-gray-600 mb-4">This information helps improve prediction accuracy</p>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Education Level (Years) *
+                        </label>
+                        <select name="education_years" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="10" {% if user.education_years == 10 %}selected{% endif %}>High School (10 years)</option>
+                            <option value="12" {% if user.education_years == 12 %}selected{% endif %}>High School Graduate (12 years)</option>
+                            <option value="14" {% if user.education_years == 14 %}selected{% endif %}>Some College (14 years)</option>
+                            <option value="16" {% if user.education_years == 16 %}selected{% endif %}>Bachelor's Degree (16 years)</option>
+                            <option value="18" {% if user.education_years == 18 %}selected{% endif %}>Master's Degree (18 years)</option>
+                            <option value="20" {% if user.education_years == 20 %}selected{% endif %}>Doctoral Degree (20+ years)</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Income Level *
+                        </label>
+                        <select name="income_level" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="0" {% if user.income_level == 0 %}selected{% endif %}>Below $10,000</option>
+                            <option value="1" {% if user.income_level == 1 %}selected{% endif %}>$10,000 - $30,000</option>
+                            <option value="2" {% if user.income_level == 2 %}selected{% endif %}>$30,000 - $60,000</option>
+                            <option value="3" {% if user.income_level == 3 %}selected{% endif %}>Above $60,000</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Marital Status *
+                        </label>
+                        <select name="marital_status" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="0" {% if user.marital_status == 0 %}selected{% endif %}>Single</option>
+                            <option value="1" {% if user.marital_status == 1 %}selected{% endif %}>Married</option>
+                            <option value="2" {% if user.marital_status == 2 %}selected{% endif %}>Divorced</option>
+                            <option value="3" {% if user.marital_status == 3 %}selected{% endif %}>Widowed</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Employment Status *
+                        </label>
+                        <select name="employment_status" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="0" {% if user.employment_status == 0 %}selected{% endif %}>Unemployed</option>
+                            <option value="1" {% if user.employment_status == 1 %}selected{% endif %}>Employed</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Residence Type *
+                        </label>
+                        <select name="residence_type" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="0" {% if user.residence_type == 0 %}selected{% endif %}>Rural</option>
+                            <option value="1" {% if user.residence_type == 1 %}selected{% endif %}>Urban</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Family History of Depression *
+                        </label>
+                        <select name="family_history_depression" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="0" {% if user.family_history_depression == 0 %}selected{% endif %}>No</option>
+                            <option value="1" {% if user.family_history_depression == 1 %}selected{% endif %}>Yes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-end">
+                <a href="/profile" class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition text-center">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </a>
+                <button type="submit" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition shadow-lg">
+                    <i class="fas fa-save mr-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
+
+        <!-- Info Box -->
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mt-6 rounded">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-blue-700">
+                        <strong>Note:</strong> Your demographic information helps our AI models provide more accurate predictions. All data is kept confidential and secure.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

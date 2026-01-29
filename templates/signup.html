@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+{% block title %}Sign Up - Depression Prediction System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-8 px-4">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-2xl p-6 sm:p-8">
+            <div class="text-center mb-6">
+                <a href="/" class="inline-block text-purple-600 hover:text-purple-700 mb-4">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Home
+                </a>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                    <i class="fas fa-user-plus text-purple-600 mr-2"></i>Create Account
+                </h1>
+                <p class="text-gray-600">Join us for personalized mental health insights</p>
+            </div>
+
+            {% for message in get_flashed_messages() %}
+                <div class="mb-4 p-4 rounded-lg bg-blue-100 text-blue-700">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <form id="signupForm" method="POST" action="/signup" class="space-y-6">
+                
+                <!-- Basic Information -->
+                <div class="border-2 border-purple-200 rounded-lg p-5 bg-purple-50">
+                    <h3 class="text-xl font-bold mb-4 text-purple-700">
+                        <i class="fas fa-user mr-2"></i>Basic Information
+                    </h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                            <input type="text" name="full_name" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                   placeholder="Enter your full name">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                            <input type="email" name="email" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                   placeholder="your.email@example.com">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+                            <div class="relative">
+                                <input type="password" id="password" name="password" required
+                                       class="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                       placeholder="Min 8 characters">
+                                <button type="button" onclick="togglePassword('password', 'togglePassword1')"
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                    <i id="togglePassword1" class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Must contain uppercase, lowercase, and number</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
+                            <div class="relative">
+                                <input type="password" id="confirm_password" name="confirm_password" required
+                                       class="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                       placeholder="Re-enter password">
+                                <button type="button" onclick="togglePassword('confirm_password', 'togglePassword2')"
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                    <i id="togglePassword2" class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Age *</label>
+                            <input type="number" name="age" required min="18" max="100"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                   placeholder="Your age">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
+                            <select name="gender" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">Select gender</option>
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                                <option value="other">Other</option>
+                                <option value="prefer_not_to_say">Prefer not to say</option>
+                            </select>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone (Optional)</label>
+                            <input type="tel" name="phone"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                   placeholder="+1 (555) 123-4567">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demographic Information -->
+                <div class="border-2 border-blue-200 rounded-lg p-5 bg-blue-50">
+                    <h3 class="text-xl font-bold mb-4 text-blue-700">
+                        <i class="fas fa-chart-bar mr-2"></i>Demographic Information
+                        <span class="text-sm font-normal text-gray-600">(Helps improve predictions)</span>
+                    </h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Education Level</label>
+                            <select name="education_years"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="10">High School (10 years)</option>
+                                <option value="12">High School Graduate (12 years)</option>
+                                <option value="14" selected>Some College (14 years)</option>
+                                <option value="16">Bachelor's Degree (16 years)</option>
+                                <option value="18">Master's Degree (18 years)</option>
+                                <option value="20">Doctoral Degree (20+ years)</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Income Level (Annual)</label>
+                            <select name="income_level"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="0">Less than ₹8,00,000</option>
+                                <option value="1">₹8,00,000 - ₹25,00,000</option>
+                                <option value="2" selected>₹25,00,000 - ₹40,00,000</option>
+                                <option value="3">More than ₹40,00,000</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Marital Status</label>
+                            <select name="marital_status"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="0" selected>Single</option>
+                                <option value="1">Married</option>
+                                <option value="2">Divorced</option>
+                                <option value="3">Widowed</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Employment Status</label>
+                            <select name="employment_status"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="0">Unemployed</option>
+                                <option value="1" selected>Employed</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Residence Type</label>
+                            <select name="residence_type"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="0">Rural</option>
+                                <option value="1" selected>Urban</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Family History of Depression</label>
+                            <select name="family_history_depression"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="0" selected>No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="flex items-start">
+                    <input type="checkbox" name="terms" required
+                           class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                    <label class="ml-2 text-sm text-gray-700">
+                        I agree to the <a href="#" class="text-purple-600 hover:underline">Terms of Service</a> 
+                        and <a href="#" class="text-purple-600 hover:underline">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit"
+                            class="w-full md:w-auto bg-purple-600 text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-purple-700 transition transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-user-plus mr-2"></i>Create Account
+                    </button>
+                </div>
+
+                <!-- Login Link -->
+                <div class="text-center text-sm text-gray-600">
+                    Already have an account? 
+                    <a href="/login" class="text-purple-600 hover:underline font-semibold">Login here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle password visibility
+function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+    const password = document.querySelector('input[name="password"]').value;
+    const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+    
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        alert('Passwords do not match!');
+        return false;
+    }
+    
+    // Password strength validation
+    if (password.length < 8) {
+        e.preventDefault();
+        alert('Password must be at least 8 characters long!');
+        return false;
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+        e.preventDefault();
+        alert('Password must contain at least one uppercase letter!');
+        return false;
+    }
+    
+    if (!/[a-z]/.test(password)) {
+        e.preventDefault();
+        alert('Password must contain at least one lowercase letter!');
+        return false;
+    }
+    
+    if (!/\d/.test(password)) {
+        e.preventDefault();
+        alert('Password must contain at least one number!');
+        return false;
+    }
+});
+</script>
+{% endblock %}

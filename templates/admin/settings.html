@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings - Mental Health Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+        
+        .admin-sidebar {
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            position: fixed;
+            height: 100vh;
+            overflow-y: scroll;
+            scrollbar-width: thin;
+        }
+        
+        .admin-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .admin-sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        
+        .main-content {
+            margin-left: 256px;
+            height: 100vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+        
+        .setting-card {
+            transition: all 0.3s ease;
+        }
+        
+        .setting-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Sidebar -->
+    <div class="admin-sidebar w-64 text-white z-30">
+        <div class="flex flex-col h-full">
+            <!-- Logo -->
+            <div class="flex items-center justify-center h-20 border-b border-white/20 flex-shrink-0">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-3">
+                        <i class="fas fa-user-shield text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">Admin Panel</h1>
+                        <p class="text-xs text-purple-200">Control Center</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <a href="/admin/dashboard" class="flex items-center px-4 py-3 rounded-lg hover:bg-white/20 transition">
+                    <i class="fas fa-tachometer-alt w-6"></i>
+                    <span class="ml-3">Dashboard</span>
+                </a>
+                <a href="/admin/users" class="flex items-center px-4 py-3 rounded-lg hover:bg-white/20 transition">
+                    <i class="fas fa-users w-6"></i>
+                    <span class="ml-3">Users</span>
+                </a>
+                <a href="/admin/predictions" class="flex items-center px-4 py-3 rounded-lg hover:bg-white/20 transition">
+                    <i class="fas fa-chart-line w-6"></i>
+                    <span class="ml-3">Predictions</span>
+                </a>
+                <a href="/admin/settings" class="flex items-center px-4 py-3 bg-white/20 rounded-lg hover:bg-white/30 transition">
+                    <i class="fas fa-cog w-6"></i>
+                    <span class="ml-3">Settings</span>
+                </a>
+            </nav>
+
+            <!-- User Info & Logout -->
+            <div class="p-4 border-t border-white/20 flex-shrink-0">
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-semibold">Administrator</p>
+                        <p class="text-xs text-purple-200">{{ session.get('admin_username', 'admin') }}</p>
+                    </div>
+                </div>
+                <a href="/admin/logout" class="flex items-center justify-center px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="bg-white shadow-sm sticky top-0 z-20">
+            <div class="flex items-center justify-between px-8 py-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">System Settings</h2>
+                    <p class="text-gray-600 text-sm">Configure system preferences</p>
+                </div>
+                <a href="/admin/dashboard" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-8">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="mb-6 p-4 rounded-lg {% if category == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                        <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} mr-2"></i>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="/admin/settings">
+                <!-- General Settings -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-6 setting-card">
+                    <h3 class="text-lg font-bold text-gray-800 mb-6">
+                        <i class="fas fa-cog text-purple-600 mr-2"></i>
+                        General Settings
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <!-- Site Name -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Site Name
+                            </label>
+                            <input type="text" name="site_name" 
+                                   value="{{ settings.get('site_name', 'Mental Health Platform') }}"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        
+                        <!-- Maintenance Mode -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-semibold text-gray-800">Maintenance Mode</p>
+                                <p class="text-sm text-gray-600">Temporarily disable site access</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="maintenance_mode" 
+                                       {% if settings.get('maintenance_mode') %}checked{% endif %}>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <!-- Allow Signups -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-semibold text-gray-800">Allow New Signups</p>
+                                <p class="text-sm text-gray-600">Enable user registration</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="allow_signups" 
+                                       {% if settings.get('allow_signups', True) %}checked{% endif %}>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Settings -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-6 setting-card">
+                    <h3 class="text-lg font-bold text-gray-800 mb-6">
+                        <i class="fas fa-robot text-purple-600 mr-2"></i>
+                        AI Settings
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <!-- Gemini AI -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-semibold text-gray-800">Gemini AI Therapy</p>
+                                <p class="text-sm text-gray-600">Enable AI-powered therapy sessions</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="gemini_enabled" 
+                                       {% if settings.get('gemini_enabled', True) %}checked{% endif %}>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Information -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-6 setting-card">
+                    <h3 class="text-lg font-bold text-gray-800 mb-6">
+                        <i class="fas fa-info-circle text-purple-600 mr-2"></i>
+                        System Information
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <p class="text-sm text-gray-600 mb-1">Flask Version</p>
+                            <p class="font-semibold text-gray-800">2.3.0</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <p class="text-sm text-gray-600 mb-1">Python Version</p>
+                            <p class="font-semibold text-gray-800">3.11+</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <p class="text-sm text-gray-600 mb-1">Database</p>
+                            <p class="font-semibold text-gray-800">MongoDB</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <p class="text-sm text-gray-600 mb-1">AI Models</p>
+                            <p class="font-semibold text-gray-800">4 Active</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="flex justify-end">
+                    <button type="submit" class="px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-purple-800 transition shadow-lg">
+                        <i class="fas fa-save mr-2"></i>
+                        Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        console.log('Admin Settings Page Loaded');
+    </script>
+</body>
+</html>

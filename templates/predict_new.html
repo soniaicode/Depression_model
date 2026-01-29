@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Predict - Depression Assessment{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-12">
+    <div class="bg-white rounded-lg shadow-xl p-8">
+        <h1 class="text-3xl font-bold text-center mb-4 text-gray-800">
+            <i class="fas fa-chart-line text-purple-600 mr-2"></i>Depression Risk Assessment
+        </h1>
+        <p class="text-center text-gray-600 mb-8">Complete all 31 questions for accurate AI-powered analysis</p>
+
+        <form id="predictionForm" class="space-y-8">
+            
+            <!-- Model Selection -->
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border-2 border-purple-200">
+                <label class="block text-lg font-semibold text-gray-800 mb-3">
+                    <i class="fas fa-robot mr-2 text-purple-600"></i>Select AI Model
+                </label>
+                <select name="model_type" id="model_type" 
+                        class="w-full px-4 py-3 border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-lg font-medium">
+                    <option value="logistic_regression">📊 Logistic Regression (89.3% Accuracy) ⭐ [Recommended]</option>
+                    <option value="random_forest">🌲 Random Forest (89.3% Accuracy) ⭐</option>
+                    <option value="gradient_boosting">⚡ Gradient Boosting (86.7% Accuracy)</option>
+                    <option value="deep_learning">🧠 Enhanced Multimodal
+ Neural Network (90.7% Accuracy) 🏆</option>
+                </select>
+                <p class="text-xs text-gray-500 mt-2 italic">💡 Choose any model - all are highly accurate. Enhanced Multimodal
+ requires TensorFlow.</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="bg-gray-200 rounded-full h-3">
+                <div id="progressBar" class="bg-purple-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p class="text-center text-sm text-gray-600">
+                <span id="progressText">0/31 questions completed</span>
+            </p>
+
+            <!-- Note: This template is incomplete. Use predict.html instead -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                <p class="text-yellow-800">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    This is an alternative template. For the complete questionnaire, please use the main prediction page.
+                </p>
+                <a href="/predict" class="text-purple-600 hover:text-purple-800 font-semibold mt-2 inline-block">
+                    Go to Complete Assessment →
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

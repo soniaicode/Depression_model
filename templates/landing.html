@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women's Mental Health - AI-Powered Depression Screening</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-pattern {
+            background-color: #667eea;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Hero Section -->
+    <section class="hero-pattern min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-pink-600/20"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center text-white fade-in">
+                <!-- Logo/Icon -->
+                <div class="mb-8">
+                    <div class="inline-block p-6 bg-white/10 backdrop-blur-lg rounded-full">
+                        <i class="fas fa-brain text-6xl"></i>
+                    </div>
+                </div>
+                
+                <!-- Main Heading -->
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                    Women's Mental Health
+                    <span class="block mt-2">AI-Powered Screening</span>
+                </h1>
+                
+                <!-- Subheading -->
+                <p class="text-xl md:text-2xl mb-8 text-purple-100 max-w-3xl mx-auto">
+                    Advanced machine learning technology for early depression detection and personalized wellness guidance
+                </p>
+                
+                <!-- Stats -->
+                <div class="flex flex-wrap justify-center gap-8 mb-12">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold">88.9%</div>
+                        <div class="text-purple-200">Target Accuracy</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold">4</div>
+                        <div class="text-purple-200">AI Models</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold">31</div>
+                        <div class="text-purple-200">Assessment Points</div>
+                    </div>
+                </div>
+                
+                <!-- CTA Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/login" class="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-purple-50 transition shadow-lg hover:shadow-xl">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Login to Start
+                    </a>
+                    <a href="/signup" class="bg-white/10 backdrop-blur-lg text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 transition border-2 border-white/30">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Sign Up Free
+                    </a>
+                </div>
+                
+                <!-- Secondary CTA -->
+                <div class="mt-4">
+                    <a href="#features" class="text-white hover:text-purple-100 transition">
+                        <i class="fas fa-chevron-down mr-2"></i>
+                        Learn More
+                    </a>
+                </div>
+                
+                <!-- Trust Badge -->
+                <div class="mt-12 text-purple-100">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    100% Confidential & Secure • HIPAA-Conscious Design
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <a href="#features" class="text-white">
+                <i class="fas fa-chevron-down text-3xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    <span class="gradient-text">Why Choose Our Platform?</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Combining cutting-edge AI with compassionate care for comprehensive mental health support
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="card-hover bg-gradient-to-br from-purple-50 to-pink-50 p-8 rounded-2xl">
+                    <div class="text-5xl mb-4">🧠</div>
+                    <h3 class="text-2xl font-bold mb-3 text-gray-800">Advanced AI Models</h3>
+                    <p class="text-gray-600 mb-4">
+                        Choose from 4 state-of-the-art machine learning models including Enhanced Multimodal
+ Neural Networks with up to 88.9% target accuracy
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>🏆 Enhanced Multimodal (Target: 88.9%)</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Random Forest (85.3%)</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>XGBoost (79.1%)</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Logistic Regression (78.0%)</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="card-hover bg-gradient-to-br from-blue-50 to-cyan-50 p-8 rounded-2xl">
+                    <div class="text-5xl mb-4">✨</div>
+                    <h3 class="text-2xl font-bold mb-3 text-gray-800">AI-Powered Insights</h3>
+                    <p class="text-gray-600 mb-4">
+                        Get personalized explanations and holistic wellness recommendations powered by Google Gemini 2.0 AI
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Intelligent explanations</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>6 holistic wellness tips</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Spiritual guidance</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Personalized recommendations</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="card-hover bg-gradient-to-br from-green-50 to-emerald-50 p-8 rounded-2xl">
+                    <div class="text-5xl mb-4">💖</div>
+                    <h3 class="text-2xl font-bold mb-3 text-gray-800">Women-Focused Care</h3>
+                    <p class="text-gray-600 mb-4">
+                        Comprehensive assessment designed specifically for women's mental health needs and experiences
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Hormonal factors</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Postpartum considerations</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Body image & relationships</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Work-life balance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    <span class="gradient-text">How It Works</span>
+                </h2>
+                <p class="text-xl text-gray-600">Simple, fast, and confidential</p>
+            </div>
+            
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl font-bold text-purple-600">1</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Choose Model</h3>
+                    <p class="text-gray-600">Select from 4 AI models based on your preference</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl font-bold text-purple-600">2</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Complete Assessment</h3>
+                    <p class="text-gray-600">Answer 31 questions (5-10 minutes)</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl font-bold text-purple-600">3</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Get Results</h3>
+                    <p class="text-gray-600">Instant AI analysis with risk assessment</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl font-bold text-purple-600">4</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Take Action</h3>
+                    <p class="text-gray-600">Follow personalized wellness recommendations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Assessment Details -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold mb-6">
+                        <span class="gradient-text">Comprehensive 31-Point Assessment</span>
+                    </h2>
+                    <p class="text-xl text-gray-600 mb-8">
+                        Our scientifically-backed questionnaire covers all aspects of mental health
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-brain text-purple-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">PHQ-9 Psychological Symptoms</h4>
+                                <p class="text-gray-600">Standard depression screening questions (9 items)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-venus text-pink-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Women-Specific Factors</h4>
+                                <p class="text-gray-600">Hormonal, postpartum, body image considerations (6 items)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-heartbeat text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Physiological Indicators</h4>
+                                <p class="text-gray-600">Sleep, heart rate, stress, physical health (10 items)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-users text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Social & Environmental</h4>
+                                <p class="text-gray-600">Support systems, stress, lifestyle factors (6 items)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-purple-100 to-pink-100 p-8 rounded-3xl">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-gray-600">Assessment Progress</span>
+                            <span class="text-purple-600 font-bold">31/31</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="bg-gradient-to-r from-purple-600 to-pink-600 h-3 rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h4 class="font-bold text-lg mb-4">What You'll Receive:</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                <span>Depression risk assessment</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                <span>Probability percentages</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                <span>AI-powered explanations</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                <span>6 holistic wellness tips</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                <span>Spiritual guidance</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                <span>Personalized recommendations</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 gradient-bg text-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                Ready to Take the First Step?
+            </h2>
+            <p class="text-xl mb-8 text-purple-100 max-w-2xl mx-auto">
+                Your mental health matters. Start your free, confidential assessment today and get personalized insights in minutes.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/signup" class="inline-block bg-white text-purple-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-purple-50 transition shadow-2xl hover:shadow-3xl">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Sign Up Free
+                </a>
+                <a href="/login" class="inline-block bg-white/20 backdrop-blur-lg text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/30 transition border-2 border-white/50">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Login
+                </a>
+            </div>
+            <p class="mt-6 text-purple-200">
+                <i class="fas fa-clock mr-2"></i>Takes only 5-10 minutes • Free account required
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h4 class="text-white font-bold text-lg mb-4">About</h4>
+                    <p class="text-sm">
+                        AI-powered mental health screening platform designed specifically for women's wellness.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold text-lg mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/login" class="hover:text-white transition">Login</a></li>
+                        <li><a href="/signup" class="hover:text-white transition">Sign Up</a></li>
+                        <li><a href="#features" class="hover:text-white transition">Features</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold text-lg mb-4">Resources</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">How It Works</a></li>
+                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold text-lg mb-4">Emergency</h4>
+                    <p class="text-sm mb-2">If you're in crisis:</p>
+                    <p class="text-white font-bold">988 Suicide & Crisis Lifeline</p>
+                    <p class="text-sm">Available 24/7</p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 text-center text-sm">
+                <p>&copy; 2025 MindCare - Women's Mental Health Platform. All rights reserved to <strong class="text-purple-400">Soni, PhD Scholar</strong>.</p>
+                <p class="mt-2 text-gray-500">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    This is a screening tool, not a diagnostic tool. Always consult healthcare professionals.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}History - Prediction Records{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6 sm:py-8 md:py-12">
+    <div class="text-center mb-6 sm:mb-8 md:mb-12">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">
+            <i class="fas fa-history text-purple-600 mr-2"></i>
+            <span class="hidden sm:inline">My </span>History
+        </h1>
+        {% if user %}
+        <p class="text-gray-600 mt-2">{{ user.full_name }}'s Assessment History</p>
+        {% endif %}
+    </div>
+
+    {% if error %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+        <p><strong>Error:</strong> {{ error }}</p>
+        <p class="text-sm mt-2">Make sure MongoDB is running: <code>mongod</code></p>
+    </div>
+    {% endif %}
+
+    <!-- Desktop Table View -->
+    <div class="hidden md:block bg-white rounded-lg shadow-lg overflow-hidden">
+        {% if predictions %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-purple-600 text-white">
+                    <tr>
+                        <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                            Date & Time
+                        </th>
+                        <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                            Prediction
+                        </th>
+                        <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                            Risk Level
+                        </th>
+                        <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                            Probability
+                        </th>
+                        <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                            Model
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for pred in predictions %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ pred.timestamp.strftime('%Y-%m-%d %H:%M:%S') if pred.timestamp else 'N/A' }}
+                        </td>
+                        <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
+                            {% if pred.result.prediction == 1 %}
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                <i class="fas fa-exclamation-circle mr-1"></i> Depression
+                            </span>
+                            {% else %}
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                <i class="fas fa-check-circle mr-1"></i> No Depression
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
+                            {% set risk = pred.result.risk_level %}
+                            {% if risk == 'Low' %}
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Low</span>
+                            {% elif risk == 'Moderate' %}
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Moderate</span>
+                            {% elif risk == 'High' %}
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">High</span>
+                            {% else %}
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Very High</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ "%.1f"|format(pred.result.probability.depression * 100) }}%
+                        </td>
+                        <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ pred.model_version or 'v1.0' }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-inbox text-gray-400 text-6xl mb-4"></i>
+            <p class="text-gray-500 text-lg">No predictions yet</p>
+            <a href="/predict" class="mt-4 inline-block bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
+                Make First Prediction
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="md:hidden space-y-4">
+        {% if predictions %}
+            {% for pred in predictions %}
+            <div class="bg-white rounded-lg shadow-lg p-4">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        {% if pred.result.prediction == 1 %}
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                            <i class="fas fa-exclamation-circle mr-1"></i> Depression
+                        </span>
+                        {% else %}
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <i class="fas fa-check-circle mr-1"></i> No Depression
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% set risk = pred.result.risk_level %}
+                        {% if risk == 'Low' %}
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Low</span>
+                        {% elif risk == 'Moderate' %}
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Moderate</span>
+                        {% elif risk == 'High' %}
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">High</span>
+                        {% else %}
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Very High</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Date:</span>
+                        <span class="font-medium">{{ pred.timestamp.strftime('%Y-%m-%d') if pred.timestamp else 'N/A' }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Time:</span>
+                        <span class="font-medium">{{ pred.timestamp.strftime('%H:%M:%S') if pred.timestamp else 'N/A' }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Probability:</span>
+                        <span class="font-medium">{{ "%.1f"|format(pred.result.probability.depression * 100) }}%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Model:</span>
+                        <span class="font-medium">{{ pred.model_version or 'v1.0' }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="bg-white rounded-lg shadow-lg text-center py-12 px-4">
+            <i class="fas fa-inbox text-gray-400 text-5xl mb-4"></i>
+            <p class="text-gray-500 text-base mb-4">No predictions yet</p>
+            <a href="/predict" class="inline-block bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
+                Make First Prediction
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

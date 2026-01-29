@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+{% block title %}AI-Powered Depression Assessment{% endblock %}
+
+{% block content %}
+<style>
+    .model-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .model-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .model-card.selected {
+        border: 3px solid #8b5cf6;
+        background: linear-gradient(135deg, #f3e7ff 0%, #e9d5ff 100%);
+    }
+    .metric-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin: 2px;
+    }
+    .metric-excellent { background: #10b981; color: white; }
+    .metric-good { background: #3b82f6; color: white; }
+    .metric-fair { background: #f59e0b; color: white; }
+    
+    .question-card {
+        transition: all 0.2s ease;
+    }
+    .question-card:hover {
+        background: #f9fafb;
+    }
+    .question-answered {
+        border-left: 4px solid #10b981;
+        background: #f0fdf4;
+    }
+    
+    .result-card {
+        animation: slideIn 0.5s ease-out;
+    }
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+</style>
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+    
+    <!-- Header Section -->
+    <div class="text-center mb-8">
+        <div class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full mb-4">
+            <i class="fas fa-brain mr-2"></i>
+            <span class="font-semibold">AI-Powered Mental Health Assessment</span>
+        </div>
+        <h1 class="text-4xl font-bold text-gray-800 mb-3">
+            Depression Risk Assessment
+        </h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            Advanced machine learning models trained on comprehensive mental health data to provide accurate depression risk assessment
+        </p>
+    </div>
+
+    <!-- Model Selection Section -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">
+                <i class="fas fa-robot text-purple-600 mr-2"></i>
+                Step 1: Choose Your AI Model
+            </h2>
+            <button type="button" onclick="showModelComparison()" 
+                    class="text-purple-600 hover:text-purple-800 font-semibold text-sm">
+                <i class="fas fa-chart-bar mr-1"></i>Compare Models
+            </button>
+        </div>
+        
+        <div id="modelGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Models will be loaded here dynamically -->
+            <div class="text-center py-8 col-span-full">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                <p class="mt-4 text-gray-600">Loading AI models...</p>
+            </div>
+        </div>
+        
+        <input type="hidden" id="selectedModel" name="model_type">
+    </div>
+
+    <!-- Assessment Form -->
+    <form id="predictionForm" onsubmit="return handleFormSubmit(event);">
+        
+        <!-- Progress Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    <i class="fas fa-clipboard-list text-purple-600 mr-2"></i>
+                    Step 2: Complete Assessment
+                </h2>
+                <div class="text-right">
+                    <span id="progressText" class="text-lg font-bold text-purple-600">0/31</span>
+                    <span class="text-sm text-gray-600">completed</span>
+                </div>
+            </div>
+            
+            <div class="bg-gray-200 rounded-full h-3 mb-2">
+                <div id="progressBar" class="bg-gradient-to-r from-purple-600 to-blue-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            
+            <p class="text-sm text-gray-600 text-center">
+                <i class="fas fa-info-circle mr-1"></i>
+                Please answer all questions honestly for accurate results
+            </p>
+        </div>
+
+        <!-- Questions Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">
+                <i class="fas fa-question-circle text-purple-600 mr-2"></i>
+                Assessment Questions
+            </h3>
+            
+            <div id="questionsContainer" class="space-y-4">
+                <!-- Questions will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center mb-8">
+            <button type="submit" id="submitBtn"
+                    class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-12 py-4 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-brain mr-2"></i>
+                Analyze Depression Risk
+            </button>
+            <p id="submitHint" class="text-sm text-gray-500 mt-3"></p>
+        </div>
+    </form>
+
+    <!-- Loading State -->
+    <div id="loading" class="hidden">
+        <div class="bg-white rounded-2xl shadow-xl p-12 text-center">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mb-4"></div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">Analyzing Your Responses...</h3>
+            <p class="text-gray-600">Our AI model is processing your assessment</p>
+            <div class="mt-6 flex justify-center space-x-4 text-sm text-gray-500">
+                <span class="pulse-animation"><i class="fas fa-check-circle text-green-500 mr-1"></i>Data validated</span>
+                <span class="pulse-animation" style="animation-delay: 0.5s"><i class="fas fa-cog fa-spin text-blue-500 mr-1"></i>AI processing</span>
+                <span class="pulse-animation" style="animation-delay: 1s"><i class="fas fa-chart-line text-purple-500 mr-1"></i>Generating insights</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="results" class="hidden">
+        <!-- Results will be displayed here -->
+    </div>
+
+    <!-- Model Comparison Modal -->
+    <div id="modelComparisonModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
+                <h3 class="text-2xl font-bold text-gray-800">
+                    <i class="fas fa-chart-bar text-purple-600 mr-2"></i>
+                    Model Performance Comparison
+                </h3>
+                <button onclick="closeModelComparison()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="comparisonContent">
+                    <!-- Comparison content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+console.log('✅ Enhanced Predict Page Loaded - v1.0');
+
+// Global variables
+let availableModels = {};
+let selectedModelKey = null;
+let questionInputs = [];
+
+// Load available models
+async function loadAvailableModels() {
+    console.log('📊 Loading available models...');
+    try {
+        const response = await fetch('/api/available-models');
+        const data = await response.json();
+        console.log('📥 Models data:', data);
+        
+        if (data.success && data.models) {
+            availableModels = data.models;
+            renderModelCards();
+        } else {
+            showModelError();
+        }
+    } catch (error) {
+        console.error('❌ Error loading models:', error);
+        showModelError();
+    }
+}
+
+// Render model selection cards
+function renderModelCards() {
+    const grid = document.getElementById('modelGrid');
+    grid.innerHTML = '';
+    
+    // Sort by accuracy
+    const sortedModels = Object.entries(availableModels).sort((a, b) => b[1].accuracy - a[1].accuracy);
+    
+    sortedModels.forEach(([key, model]) => {
+        const card = document.createElement('div');
+        card.className = 'model-card bg-white border-2 border-gray-200 rounded-xl p-4 hover:border-purple-400';
+        card.onclick = () => selectModel(key);
+        card.id = `model-card-${key}`;
+        
+        let badgeClass = 'metric-good';
+        if (model.accuracy >= 88) badgeClass = 'metric-excellent';
+        else if (model.accuracy < 80) badgeClass = 'metric-fair';
+        
+        // Add highlight for best model
+        let highlightClass = model.highlight ? 'ring-4 ring-purple-400 shadow-2xl' : '';
+        card.className += ` ${highlightClass}`;
+        
+        card.innerHTML = `
+            <div class="text-center">
+                ${model.highlight ? '<div class="absolute top-2 right-2 text-2xl">🏆</div>' : ''}
+                <div class="text-4xl mb-2">${model.icon}</div>
+                <h4 class="font-bold text-gray-800 mb-1">${model.name}</h4>
+                <div class="metric-badge ${badgeClass} mb-2">
+                    ${model.accuracy}% Accuracy
+                </div>
+                ${model.auc_roc ? `
+                <div class="text-xs text-gray-600 mb-1">
+                    <span class="font-semibold">AUC-ROC:</span> ${model.auc_roc.toFixed(3)}
+                </div>
+                ` : ''}
+                <p class="text-xs text-gray-600 mb-2">${model.description}</p>
+                <span class="inline-block ${model.highlight ? 'bg-purple-600 text-white' : 'bg-purple-100 text-purple-700'} text-xs px-2 py-1 rounded font-semibold">
+                    ${model.badge}
+                </span>
+            </div>
+        `;
+        
+        grid.appendChild(card);
+    });
+    
+    // Auto-select best model
+    const bestModel = sortedModels[0][0];
+    if (bestModel) {
+        selectModel(bestModel);
+    }
+}
+
+// Select model
+function selectModel(key) {
+    selectedModelKey = key;
+    document.getElementById('selectedModel').value = key;
+    
+    // Update UI
+    document.querySelectorAll('.model-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    document.getElementById(`model-card-${key}`).classList.add('selected');
+    
+    console.log(`✅ Selected model: ${key}`);
+}
+
+// Show model error
+function showModelError() {
+    const grid = document.getElementById('modelGrid');
+    grid.innerHTML = `
+        <div class="col-span-full text-center py-8">
+            <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
+            <p class="text-gray-700 font-semibold mb-2">Models not available</p>
+            <p class="text-sm text-gray-600">Please train models first or contact administrator</p>
+        </div>
+    `;
+}
+
+// Load questions
+function loadQuestions() {
+    // Questions will be loaded from your existing structure
+    // This is a placeholder - integrate with your existing question loading
+    console.log('📋 Questions loaded');
+}
+
+// Form submission handler
+function handleFormSubmit(event) {
+    console.log('🚀 Form submit triggered');
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (!selectedModelKey) {
+        alert('⚠️ Please select an AI model first!');
+        return false;
+    }
+    
+    submitPrediction();
+    return false;
+}
+
+// Submit prediction
+async function submitPrediction() {
+    console.log('📤 Submitting prediction...');
+    
+    const form = document.getElementById('predictionForm');
+    if (!form) {
+        console.error('❌ Form not found!');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('loading').classList.remove('hidden');
+    document.getElementById('results').classList.add('hidden');
+    window.scrollTo({ top: document.getElementById('loading').offsetTop - 100, behavior: 'smooth' });
+    
+    // Get form data
+    const formData = new FormData(form);
+    formData.set('model_type', selectedModelKey);
+    
+    const data = {};
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
+    
+    try {
+        console.log('Submitting with data:', data);
+        
+        const response = await fetch('/predict', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        console.log('Response status:', response.status);
+        const result = await response.json();
+        console.log('Result:', result);
+        
+        if (result.success) {
+            displayResults(result.result, selectedModelKey);
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+        alert('Error: ' + error.message);
+    } finally {
+        document.getElementById('loading').classList.add('hidden');
+    }
+}
+
+// Display results (placeholder - integrate with your existing results display)
+function displayResults(result, modelKey) {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.classList.remove('hidden');
+    
+    // Your existing results display logic here
+    console.log('✅ Displaying results for model:', modelKey);
+    
+    window.scrollTo({ top: resultsDiv.offsetTop - 100, behavior: 'smooth' });
+}
+
+// Model comparison modal
+function showModelComparison() {
+    document.getElementById('modelComparisonModal').classList.remove('hidden');
+    loadComparisonData();
+}
+
+function closeModelComparison() {
+    document.getElementById('modelComparisonModal').classList.add('hidden');
+}
+
+function loadComparisonData() {
+    const content = document.getElementById('comparisonContent');
+    
+    // Create comparison table
+    let tableHTML = `
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-300">
+                <thead class="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-bold">Model</th>
+                        <th class="px-4 py-3 text-center font-bold">Accuracy</th>
+                        <th class="px-4 py-3 text-center font-bold">Precision</th>
+                        <th class="px-4 py-3 text-center font-bold">Recall</th>
+                        <th class="px-4 py-3 text-center font-bold">F1-Score</th>
+                        <th class="px-4 py-3 text-center font-bold">AUC-ROC</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    // Sort models by accuracy
+    const sortedModels = Object.entries(availableModels)
+        .map(([key, model]) => ({
+            key,
+            ...model,
+            ...modelMetadata[key]
+        }))
+        .sort((a, b) => b.accuracy - a.accuracy);
+    
+    sortedModels.forEach((model, idx) => {
+        const rowClass = idx === 0 ? 'bg-green-50 font-bold' : idx % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+        const badge = idx === 0 ? '<span class="ml-2 text-xl">🏆</span>' : '';
+        
+        tableHTML += `
+            <tr class="${rowClass} hover:bg-purple-50 transition">
+                <td class="px-4 py-3 border-t">
+                    <div class="flex items-center">
+                        <span class="text-2xl mr-2">${model.icon}</span>
+                        <span class="font-semibold">${model.name}</span>
+                        ${badge}
+                    </div>
+                </td>
+                <td class="px-4 py-3 border-t text-center font-bold text-lg">${model.accuracy}%</td>
+                <td class="px-4 py-3 border-t text-center">${model.precision || '-'}%</td>
+                <td class="px-4 py-3 border-t text-center">${model.recall || '-'}%</td>
+                <td class="px-4 py-3 border-t text-center">${model.f1_score || '-'}%</td>
+                <td class="px-4 py-3 border-t text-center font-semibold">${model.auc_roc ? model.auc_roc.toFixed(3) : '-'}</td>
+            </tr>
+        `;
+    });
+    
+    tableHTML += `
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4">
+            <h4 class="font-bold text-blue-900 mb-2">
+                <i class="fas fa-info-circle mr-2"></i>Performance Insights
+            </h4>
+            <ul class="text-sm text-blue-800 space-y-1">
+                <li>🏆 <strong>Enhanced Multimodal</strong> achieves the highest accuracy (88.9%) and AUC-ROC (0.921)</li>
+                <li>📊 This represents a <strong>+10.9%</strong> improvement over the baseline Logistic Regression</li>
+                <li>🎯 AUC-ROC > 0.9 indicates <strong>excellent</strong> discrimination ability</li>
+                <li>⚡ All models show good performance (>75% accuracy) for clinical use</li>
+            </ul>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <p class="text-sm text-gray-600">
+                <i class="fas fa-graduation-cap mr-1"></i>
+                Data from PhD Research: Depression Detection Using Machine Learning
+            </p>
+        </div>
+    `;
+    
+    content.innerHTML = tableHTML;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎯 Initializing enhanced predict page...');
+    loadAvailableModels();
+    loadQuestions();
+});
+
+</script>
+{% endblock %}

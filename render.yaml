@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: dp-app
+    env: python
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:10000
+    envVars:
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: MONGO_URI
+        value: mongodb://localhost:27017/depression_db

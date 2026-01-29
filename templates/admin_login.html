@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Mental Health Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .user-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: particle-float 15s infinite;
+        }
+        @keyframes particle-float {
+            0%, 100% { transform: translate(0, 0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="user-gradient min-h-screen flex items-center justify-center relative overflow-hidden">
+    
+    <!-- Animated Particles -->
+    <div class="particle" style="width: 100px; height: 100px; left: 10%; top: 20%; animation-delay: 0s;"></div>
+    <div class="particle" style="width: 150px; height: 150px; right: 15%; top: 30%; animation-delay: 2s;"></div>
+    <div class="particle" style="width: 80px; height: 80px; left: 70%; bottom: 20%; animation-delay: 4s;"></div>
+    <div class="particle" style="width: 120px; height: 120px; right: 60%; bottom: 30%; animation-delay: 6s;"></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="max-w-md mx-auto">
+            <!-- Back Button -->
+            <a href="/" class="inline-flex items-center text-white hover:text-purple-200 mb-6 transition">
+                <i class="fas fa-arrow-left mr-2"></i>
+                <span>Back to Home</span>
+            </a>
+
+            <!-- Login Card -->
+            <div class="glass-effect rounded-3xl shadow-2xl p-8 animate-float">
+                <!-- Logo/Icon -->
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full mb-4 shadow-lg">
+                        <i class="fas fa-user-shield text-white text-4xl"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Admin Portal</h1>
+                    <p class="text-gray-600">Secure Administrator Access</p>
+                </div>
+
+                <!-- Flash Messages -->
+                {% for message in get_flashed_messages() %}
+                    <div class="mb-6 p-4 rounded-xl {% if 'Invalid' in message %}bg-red-50 border-l-4 border-red-500 text-red-700{% else %}bg-blue-50 border-l-4 border-blue-500 text-blue-700{% endif %}">
+                        <div class="flex items-center">
+                            <i class="fas {% if 'Invalid' in message %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-3"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <!-- Login Form -->
+                <form method="POST" action="/admin/login" class="space-y-6">
+                    <!-- Username -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-user mr-2 text-purple-600"></i>Username
+                        </label>
+                        <input type="text" name="username" required
+                               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition outline-none"
+                               placeholder="Enter admin username">
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-lock mr-2 text-purple-600"></i>Password
+                        </label>
+                        <div class="relative">
+                            <input type="password" id="adminPassword" name="password" required
+                                   class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition outline-none"
+                                   placeholder="Enter admin password">
+                            <button type="button" onclick="togglePassword()"
+                                    class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-600 transition">
+                                <i id="toggleIcon" class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit"
+                            class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition shadow-lg hover:shadow-xl">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Access Admin Panel
+                    </button>
+                </form>
+
+                <!-- Security Notice -->
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-500 p-4 rounded-lg">
+                        <div class="flex items-start">
+                            <i class="fas fa-shield-alt text-yellow-600 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-sm font-semibold text-yellow-800 mb-1">Security Notice</p>
+                                <p class="text-xs text-yellow-700">
+                                    This area is restricted to authorized administrators. All access attempts are logged and monitored.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-6 text-center">
+                    <p class="text-xs text-gray-500">
+                        <i class="fas fa-lock mr-1"></i>
+                        Secured with 256-bit encryption
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('adminPassword');
+            const icon = document.getElementById('toggleIcon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

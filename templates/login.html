@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Login - Depression Prediction System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full">
+        <div class="bg-white rounded-lg shadow-2xl p-8">
+            <div class="text-center mb-8">
+                <a href="/" class="inline-block text-purple-600 hover:text-purple-700 mb-4">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Home
+                </a>
+                <div class="inline-block p-4 bg-purple-100 rounded-full mb-4">
+                    <i class="fas fa-brain text-purple-600 text-4xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
+                <p class="text-gray-600">Login to access your mental health insights</p>
+            </div>
+
+            {% for message in get_flashed_messages() %}
+                <div class="mb-4 p-4 rounded-lg {% if 'Account not found' in message %}bg-red-100 border-2 border-red-300{% else %}bg-blue-100{% endif %} {% if 'Account not found' in message %}text-red-700{% else %}text-blue-700{% endif %}">
+                    <i class="fas {% if 'Account not found' in message %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+            
+            {% if show_signup_prompt %}
+                <div class="mb-6 p-5 rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 border-2 border-purple-300">
+                    <div class="text-center">
+                        <i class="fas fa-user-plus text-purple-600 text-3xl mb-3"></i>
+                        <h3 class="text-lg font-bold text-purple-800 mb-2">Don't have an account yet?</h3>
+                        <p class="text-purple-700 mb-4">Create your free account now and get personalized mental health insights!</p>
+                        <a href="/signup" class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-purple-700 transition transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-user-plus mr-2"></i>Create Account Now
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+            <form method="POST" action="/login" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-envelope mr-2 text-purple-600"></i>Email Address
+                    </label>
+                    <input type="email" name="email" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="your.email@example.com">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-purple-600"></i>Password
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="loginPassword" name="password" required
+                               class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                               placeholder="Enter your password">
+                        <button type="button" onclick="toggleLoginPassword()"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                            <i id="toggleLoginIcon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" name="remember_me"
+                               class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                        <label class="ml-2 text-sm text-gray-700">Remember me</label>
+                    </div>
+                    <a href="/forgot-password" class="text-sm text-purple-600 hover:underline">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <button type="submit"
+                        class="w-full bg-purple-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-purple-700 transition transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                </button>
+
+                <div class="text-center text-sm text-gray-600">
+                    Don't have an account? 
+                    <a href="/signup" class="text-purple-600 hover:underline font-semibold">Sign up here</a>
+                </div>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <p class="text-center text-xs text-gray-500">
+                    <i class="fas fa-shield-alt mr-1"></i>
+                    Your data is secure and encrypted
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle password visibility
+function toggleLoginPassword() {
+    const input = document.getElementById('loginPassword');
+    const icon = document.getElementById('toggleLoginIcon');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>
+{% endblock %}

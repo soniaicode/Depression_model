@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Model Status{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-6">
+                <i class="fas fa-robot text-purple-600 mr-3"></i>
+                AI Model Status
+            </h1>
+            
+            <div class="space-y-4" id="modelStatus">
+                <div class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-4xl text-purple-600"></i>
+                    <p class="mt-4 text-gray-600">Loading model status...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+            <h3 class="text-xl font-bold text-blue-800 mb-3">
+                <i class="fas fa-info-circle mr-2"></i>About the Models
+            </h3>
+            <ul class="space-y-2 text-gray-700">
+                <li><strong>📊 Logistic Regression:</strong> Fast, interpretable, great for binary classification</li>
+                <li><strong>🌲 Random Forest:</strong> Ensemble method, handles non-linear relationships well</li>
+                <li><strong>⚡ Gradient Boosting:</strong> Powerful boosting algorithm, high accuracy</li>
+                <li><strong>🧠 Enhanced Multimodal
+:</strong> Neural network, best for complex patterns (requires TensorFlow)</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/available-models')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('modelStatus');
+            
+            if (data.success && data.models) {
+                let html = '';
+                
+                // Show total count
+                html += `
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl p-6 mb-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-3xl font-bold">${data.total} Models Loaded</h2>
+                                <p class="text-purple-100 mt-2">All systems operational</p>
+                            </div>
+                            <i class="fas fa-check-circle text-6xl opacity-50"></i>
+                        </div>
+                    </div>
+                `;
+                
+                // Show each model
+                Object.entries(data.models).forEach(([key, model]) => {
+                    const statusColor = model.loaded ? 'green' : 'red';
+                    const statusIcon = model.loaded ? 'check-circle' : 'times-circle';
+                    
+                    html += `
+                        <div class="border-2 border-${statusColor}-200 bg-${statusColor}-50 rounded-xl p-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-5xl">${model.icon}</div>
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-gray-800">${model.name}</h3>
+                                        <p class="text-gray-600 mt-1">Accuracy: ${model.accuracy}%</p>
+                                        <p class="text-sm text-gray-500 mt-1">Model ID: ${key}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <i class="fas fa-${statusIcon} text-4xl text-${statusColor}-600"></i>
+                                    <p class="text-${statusColor}-700 font-bold mt-2">
+                                        ${model.loaded ? 'LOADED' : 'NOT LOADED'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `
+                    <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center">
+                        <i class="fas fa-exclamation-triangle text-4xl text-red-600 mb-4"></i>
+                        <p class="text-red-800 font-bold">Failed to load model status</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('modelStatus').innerHTML = `
+                <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-600 mb-4"></i>
+                    <p class="text-red-800 font-bold">Error: ${error.message}</p>
+                </div>
+            `;
+        });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Predict Endpoint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-6">🧪 Test Predict Endpoint</h1>
+        
+        <div class="space-y-4">
+            <button onclick="testPredictEndpoint()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                Test Predict API
+            </button>
+            
+            <button onclick="testWithSampleData()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+                Test with Sample Data
+            </button>
+            
+            <button onclick="checkModels()" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700">
+                Check Available Models
+            </button>
+        </div>
+        
+        <div id="results" class="mt-6 p-4 bg-gray-50 rounded-lg">
+            <h3 class="font-bold mb-2">Results:</h3>
+            <pre id="output" class="text-sm"></pre>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            output.textContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+        }
+
+        async function testPredictEndpoint() {
+            log('Testing /predict endpoint...');
+            try {
+                const response = await fetch('/predict', {
+                    method: 'GET'
+                });
+                log(`GET /predict: ${response.status} ${response.statusText}`);
+                
+                if (response.status === 302) {
+                    log('Redirected - probably need to login first');
+                } else if (response.status === 200) {
+                    log('Predict page loaded successfully');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`);
+            }
+        }
+
+        async function testWithSampleData() {
+            log('Testing POST /predict with sample data...');
+            
+            const sampleData = {
+                model_type: 'logistic_regression'
+            };
+            
+            // Add all 31 features
+            for (let i = 0; i < 31; i++) {
+                sampleData[`feature_${i}`] = '1';
+            }
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(sampleData)
+                });
+                
+                log(`POST /predict: ${response.status} ${response.statusText}`);
+                
+                const result = await response.json();
+                log(`Response: ${JSON.stringify(result, null, 2)}`);
+                
+            } catch (error) {
+                log(`Error: ${error.message}`);
+            }
+        }
+
+        async function checkModels() {
+            log('Checking available models...');
+            try {
+                const response = await fetch('/api/available-models');
+                const result = await response.json();
+                log(`Available models: ${JSON.stringify(result, null, 2)}`);
+            } catch (error) {
+                log(`Error: ${error.message}`);
+            }
+        }
+
+        // Auto-run tests
+        window.onload = function() {
+            log('Page loaded. Click buttons to test endpoints.');
+        };
+    </script>
+</body>
+</html>
