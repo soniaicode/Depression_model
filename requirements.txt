@@ -9,8 +9,8 @@ pandas>=2.0.0,<3.0.0
 scikit-learn>=1.3.0,<1.6.0
 joblib>=1.3.0,<2.0.0
 
-# Enhanced Multimodal (TensorFlow)
-tensorflow>=2.15.0,<2.18.0
+# Enhanced Multimodal (TensorFlow) - Optimized for memory
+tensorflow-cpu>=2.15.0,<2.18.0
 keras>=2.15.0,<4.0.0
 h5py>=3.10.0,<4.0.0
 
@@ -45,7 +45,7 @@ pymongo>=4.5.0,<5.0.0
 # Additional utilities
 pathlib2>=2.3.0,<3.0.0
 
-# Voice Analysis
+# Voice Analysis (Lightweight versions)
 librosa>=0.10.0,<1.0.0
 soundfile>=0.12.0,<1.0.0
 scipy>=1.10.0,<2.0.0

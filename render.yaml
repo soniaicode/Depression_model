@@ -8,7 +8,7 @@ services:
       python --version
       pip install --upgrade pip
       pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 300 --max-requests 100 --max-requests-jitter 10 --preload
     envVars:
       - key: FLASK_SECRET_KEY
         generateValue: true
@@ -20,3 +20,5 @@ services:
         value: admin
       - key: ADMIN_PASSWORD
         sync: false
+      - key: WEB_CONCURRENCY
+        value: 1
