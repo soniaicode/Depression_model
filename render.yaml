@@ -18,4 +18,4 @@ services:
       - key: ADMIN_PASSWORD
         sync: false
       - key: PYTHON_VERSION
-        value: 3.11.0
+        value: 3.11.9
