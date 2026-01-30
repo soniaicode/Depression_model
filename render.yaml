@@ -1,13 +1,21 @@
 services:
   - type: web
-    name: dp-app
+    name: depression-prediction-app
     env: python
+    region: singapore
+    plan: free
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:10000
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
       - key: FLASK_SECRET_KEY
         generateValue: true
       - key: GEMINI_API_KEY
         sync: false
       - key: MONGO_URI
-        value: mongodb://localhost:27017/depression_db
+        sync: false
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.11.0
